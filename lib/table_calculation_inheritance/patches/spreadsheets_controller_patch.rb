@@ -18,10 +18,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-resources :projects do
-  resources :spreadsheets do
-    member do
-      get 'results'
+module TableCalculationInheritance 
+  module Patches 
+    module SpreadsheetsControllerPatch
+      def self.prepended(base)
+        base.prepend InstanceMethods
+      end
+
+      module InstanceMethods
+        ##
+        # Refers to the instance variables in SpreadsheetsController#index
+        #
+        def results
+          index
+        end
+      end
     end
+  end
+end
+
+# Apply patch
+Rails.configuration.to_prepare do
+  unless SpreadsheetsController.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetsControllerPatch)
+    SpreadsheetsController.prepend TableCalculationInheritance::Patches::SpreadsheetsControllerPatch
   end
 end
