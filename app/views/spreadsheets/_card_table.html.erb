@@ -1,0 +1,47 @@
+<%
+# frozen_string_literal: true
+
+# This file is part of the Plugin Redmine Table Calculation.
+#
+# Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
+#
+# This plugin program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+%>
+
+<% if table.calculations.present? %>
+  <%= tag.p do %>
+    <%= content_tag :table, class: 'list' do %>
+      <%= content_tag :head do %>
+        <%= content_tag :tr do %>
+          <%= content_tag(:th, l(:label_calculation), class: 'name') %>
+          <% table.columns.each do |column| %>
+            <%= content_tag(:th, column.name, class: 'name') %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= content_tag :tbody do %>
+        <% table.calculations.each do |calc| %> 
+          <%= content_tag :tr do %>
+            <%= content_tag(:td, calc.name, class: 'name') %>
+            <% @current_row = table.result_row(calc.formula, calc) %>
+            <% @current_row.each do |result| %>
+              <%= content_tag(:td, value(result.value, result.col), class: 'name') %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

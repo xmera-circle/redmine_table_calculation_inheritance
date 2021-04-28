@@ -1,0 +1,73 @@
+<%
+# frozen_string_literal: true
+
+# This file is part of the Plugin Redmine Table Calculation.
+#
+# Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
+#
+# This plugin program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+%>
+
+<%= title l(:label_calculation_summary), "#{l(:label_spreadsheet_result_plural)} #{@spreadsheet.name}"%>
+
+<%= tag.p do %>
+  <%= tag.em @spreadsheet.description %>
+<% end %>
+
+<%= tag.fieldset do %>
+  <%= tag.legend do %>
+    <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{l(:label_updated_time, time_tag(@spreadsheet.updated_on))})".html_safe %>
+  <% end %>
+  <%= render_final_result_table(@members, @spreadsheet) %>
+<% end %>
+
+<%= tag.fieldset do %>
+  <%= tag.legend do %>
+    <%= tag.strong l(:label_aggregated_result_plural) %>
+  <% end %>
+  <%= render_members_result_table(@members, @spreadsheet) %>
+<% end %>
+
+<fieldset class="collapsible collapsed" style="padding: 0;">
+  <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
+    <%= tag.strong l(:label_single_calculation_results) %>
+  </legend>
+  <% @members.each do |member| %>
+    <% spreadsheet = spreadsheet_of(member) %>
+    <% unless spreadsheet.nil? %>
+      <%= tag.h3 link_to("#{member.project_type.name} - #{member.name}",project_spreadsheet_path(member, spreadsheet) ), style: 'margin-top: 1rem; font-weight:bold'%>
+      <%= render_spreadsheet_result_table(spreadsheet) %>                                               
+    <% end %>
+  <% end %>
+</fieldset>
+
+<% html_title(l(:label_spreadsheet_result_plural)) %>
+
+<%= javascript_tag do %>
+$("a[data-expands]").click(function(e){
+  e.preventDefault();
+  var target = $($(this).attr("data-expands"));
+  if (target.attr("multiple")) {
+    $(this).find('span').switchClass('icon-toggle-minus', 'icon-toggle-plus');
+    target.attr("multiple", false);
+    target.find("option[value=all]").show();
+  } else {
+    $(this).find('span').switchClass('icon-toggle-plus', 'icon-toggle-minus');
+    target.attr("multiple", true);
+    target.find("option[value=all]").attr("selected", false).hide();
+  }
+});
+
+<% end %>
