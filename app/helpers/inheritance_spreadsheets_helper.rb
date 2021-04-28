@@ -18,4 +18,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-require 'table_calculation_inheritance/patches/spreadsheets_controller_patch'
+
+module InheritanceSpreadsheetsHelper
+  def render_final_result_table(members, spreadsheet)
+    render partial: 'calculation_results',
+           locals: { table: FinalResultTable.new(members, spreadsheet) }
+  end
+
+  def render_members_result_table(members, spreadsheet)
+    render partial: 'calculation_results',
+           locals: { table: MembersResultTable.new(members, spreadsheet) }
+  end
+
+  def render_spreadsheet_result_table(spreadsheet)
+    render partial: 'calculation_results',
+           locals: { table: SpreadsheetResultTable.new(spreadsheet) }
+  end
+
+  def render_card_table(members, spreadsheet)
+    render partial: 'spreadsheets/card_table',
+           locals: { table: FinalResultTable.new(members, spreadsheet) }
+  end
+end

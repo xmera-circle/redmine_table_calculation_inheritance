@@ -23,6 +23,9 @@ module TableCalculationInheritance
     module SpreadsheetsControllerPatch
       def self.prepended(base)
         base.prepend InstanceMethods
+        base.class_eval do
+          helper :inheritance_spreadsheets
+        end
       end
 
       module InstanceMethods
