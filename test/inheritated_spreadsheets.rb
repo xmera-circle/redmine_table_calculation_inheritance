@@ -37,17 +37,17 @@ module TableCalculationInheritance
       @host_project.enable_module!(:table_calculation)
 
       # Define table and calculation
-      first_column = TableCustomField.create(name: 'Name', field_format: 'string')
-      second_column = TableCustomField.create(name: 'Count', field_format: 'int')
+      @first_column = TableCustomField.create(name: 'Name', field_format: 'string')
+      @second_column = TableCustomField.create(name: 'Count', field_format: 'int')
       table = Table.create(name: 'Equipment', description: 'IT equipment list')
-      table.columns << [first_column, second_column]
+      table.columns << [@first_column, @second_column]
       @calculation = Calculation.create(name: 'Number of devices',
                                         description: 'Sum up the devices of a list',
                                         formula: 'sum',
                                         columns: true,
                                         rows: false,
                                         table_id: table.id)
-      @calculation.fields << second_column
+      @calculation.fields << @second_column
       table.calculations << @calculation # sets explicitly the has_many side
 
       # Define spreadsheet
@@ -58,10 +58,10 @@ module TableCalculationInheritance
                                           author_id: @manager.id,
                                           table_id: table.id)
         first_row = SpreadsheetRow.create(spreadsheet_id: spreadsheet.id, position: 1)
-        first_row.custom_field_values = { first_column.id => 'Laptop', second_column.id => 12 }
+        first_row.custom_field_values = { @first_column.id => 'Laptop', @second_column.id => 12 }
         first_row.save
         second_row = SpreadsheetRow.create(spreadsheet_id: spreadsheet.id, position: 2)
-        second_row.custom_field_values = { first_column.id => 'Smartphone', second_column.id => 5 } 
+        second_row.custom_field_values = { @first_column.id => 'Smartphone', @second_column.id => 5 } 
         second_row.save
       end
     end
