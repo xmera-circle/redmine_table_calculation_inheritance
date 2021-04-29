@@ -39,4 +39,8 @@ module InheritanceSpreadsheetsHelper
     render partial: 'spreadsheets/card_table',
            locals: { table: FinalResultTable.new(members, spreadsheet) }
   end
+
+  def spreadsheet_of(member)
+    member.spreadsheets.find_by(name: @spreadsheet.name)
+  end
 end

@@ -26,6 +26,7 @@ require File.expand_path('../../../test/test_helper', __dir__)
 require_relative 'load_fixtures'
 require_relative 'authenticate_user'
 require_relative 'project_type_creator'
+require_relative 'inheritated_spreadsheets'
 
 # The gem minitest-reporters gives color to the command-line
 require 'minitest/reporters'

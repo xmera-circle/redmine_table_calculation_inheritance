@@ -31,3 +31,7 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   requires_redmine version_or_higher: '4.1.0'
   requires_redmine_plugin :redmine_table_calculation, version_or_higher: '0.1.0'
 end
+
+ActiveSupport::Reloader.to_prepare do
+  ProjectsController.send :helper, InheritanceSpreadsheetsHelper
+end
