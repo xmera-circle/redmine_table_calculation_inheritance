@@ -38,10 +38,8 @@ module TableCaclulationInheritance
     test 'should render new for admin' do
       spreadsheet = @host_project.spreadsheets.take
       calc = spreadsheet.table.calculations.take
-      # result_row = spreadsheet.result_rows.take
 
       log_user('admin', 'admin')
-      # get edit_spreadsheet_row_result_path(result_row.id)
       get new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: spreadsheet.id,
                                                               calculation_id: calc.id,
                                                               project_id: @host_project.id)
