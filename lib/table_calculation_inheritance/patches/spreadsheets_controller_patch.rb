@@ -30,6 +30,16 @@ module TableCalculationInheritance
 
       module InstanceMethods
         ##
+        # Adds the required project type relations needed for inheritated
+        # calculations.
+        #
+        def index
+          super
+          @guests = @project.guests
+          @members = @project.guests.prepend(@project)
+        end
+
+        ##
         # Refers to the instance variables in SpreadsheetsController#index
         #
         def results
