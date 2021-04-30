@@ -20,30 +20,30 @@
 
 module TableCalculationInheritance
   module Patches
-    module SpreadsheetsControllerPatch
+    module SpreadsheetResultTablePatch
       def self.prepended(base)
-        base.prepend InstanceMethods
-        base.class_eval do
-          helper :inheritance_spreadsheets
-        end
+        base.prepend(InstanceMethods)
       end
 
       module InstanceMethods
-        ##
-        # Adds the required project type relations needed for inheritated
-        # calculations.
-        #
-        def index
-          super
-          @guests = @project.guests
-          @members = @project.guests.prepend(@project)
-        end
+        private
 
         ##
-        # Refers to the instance variables in SpreadsheetsController#index
+        # Provide rows for further calculation.
+        # A row can be a result row or a pure spreadsheet row (accessed by super).
         #
-        def results
-          index
+        # @override SpreadsheetResultTable#row
+        #
+        def rows(calculation_id)
+          single_result_row = spreadsheet.result_rows.where(calculation_id: calculation_id)
+          return single_result_row if single_result_row.present?
+
+          super
+        end
+
+        def spreadsheet_result_row(calculation_id)
+          SpreadsheetRowResult.find_by(calculation_id: calculation_id,
+                                       spreadsheet_id: spreadsheet.id)
         end
       end
     end
@@ -52,7 +52,7 @@ end
 
 # Apply patch
 Rails.configuration.to_prepare do
-  unless SpreadsheetsController.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetsControllerPatch)
-    SpreadsheetsController.prepend TableCalculationInheritance::Patches::SpreadsheetsControllerPatch
+  unless SpreadsheetResultTable.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetResultTablePatch)
+    SpreadsheetResultTable.prepend TableCalculationInheritance::Patches::SpreadsheetResultTablePatch
   end
 end

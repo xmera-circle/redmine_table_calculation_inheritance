@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation Inheritance.
+# This file is part of the Plugin Redmine Table Calculation.
 #
 # Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
 #
@@ -18,19 +18,41 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-# Suppresses ruby gems warnings when running tests
-$VERBOSE = nil
+class SpreadsheetRowResult < ActiveRecord::Base
+  include Redmine::SafeAttributes
+  acts_as_customizable
 
-# Load the Redmine helper
-require File.expand_path('../../../test/test_helper', __dir__)
-require_relative 'load_fixtures'
-require_relative 'authenticate_user'
-require_relative 'project_type_creator'
-require_relative 'inheritated_spreadsheets'
-require_relative 'test_object_creators'
+  belongs_to :calculation
+  belongs_to :spreadsheet
+  belongs_to :author, class_name: 'User'
 
-# The gem minitest-reporters gives color to the command-line
-require 'minitest/reporters'
-Minitest::Reporters.use!
-# require "minitest/rails/capybara"
-require 'mocha/minitest'
+  after_destroy :destroy_adapted_row_values
+
+  validates_presence_of :comment
+
+  safe_attributes(
+    :author_id,
+    :spreadsheet_id,
+    :calculation_id,
+    :custom_fields,
+    :custom_field_values,
+    :comment
+  )
+
+  def available_custom_fields
+    CustomField.where(id: column_ids).sorted.to_a
+  end
+
+  private
+
+  ##
+  # TODO: delegate to table
+  #
+  def column_ids
+    spreadsheet&.table&.column_ids
+  end
+
+  def destroy_adapted_row_values
+    CustomValue.where(customized_id: id).delete_all
+  end
+end
