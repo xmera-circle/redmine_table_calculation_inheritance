@@ -26,24 +26,27 @@
       <%= actions_dropdown do %>
         <%= link_to l(:label_calculation_details),
             results_project_spreadsheet_path(@project, id: spreadsheet),
-            class: 'icon icon-zoom-in' if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
-        <%= link_to l(:label_edit_spreadsheet), 
-            project_spreadsheet_path(@project, spreadsheet),
-            class: 'icon icon-edit' if User.current.allowed_to?(:edit_spreadsheet, @project)%> 
+            class: 'icon icon-zoom-in' if User.current.allowed_to?(:view_spreadsheet_results, @project) && spreadsheet.table.calculations.present? %>
+        <%= link_to l(:label_spreadsheet_configuration), 
+            edit_project_spreadsheet_path(@project, spreadsheet),
+            class: 'icon icon-settings' if User.current.allowed_to?(:configure_spreadsheet, @project)%>
+        <%= delete_link project_spreadsheet_path(@project, id: spreadsheet) if User.current.allowed_to?(:destroy_spreadsheet, @project)%>
       <% end %>
     <% end %>
 
     <%= tag.h3 class: 'icon icon-document' do %>
-      <%= "#{l(:label_calculation_summary)} - #{spreadsheet.name}" %>&nbsp;
-      <%= link_to l(:label_calculation_details),
-            results_project_spreadsheet_path(@project, id: spreadsheet),
-            class: 'icon-only icon-zoom-in',
-            title: l(:label_calculation_details) if User.current.allowed_to?(:view_spreadsheet_results, @project)%>
+      <%= link_to spreadsheet.name, project_spreadsheet_path(@project, id: spreadsheet) %>&nbsp;
+      <% if spreadsheet.table.calculations.present? %>
+        <%= link_to l(:label_calculation_details),
+              results_project_spreadsheet_path(@project, id: spreadsheet),
+              class: 'icon-only icon-zoom-in',
+              title: l(:label_calculation_details) if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
+      <% end %>
     <% end %>
 
     <%= tag.p spreadsheet.description %>
     <% if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
-      <%= render_card_table(members, spreadsheet) %>
+      <%= render_card_table(members, spreadsheet) if spreadsheet.table.calculations.present? %>
     <% end %>
     <%= tag.small do %>
       <%= authoring spreadsheet.created_on, spreadsheet.author %>.
