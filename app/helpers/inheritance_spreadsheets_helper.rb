@@ -37,4 +37,9 @@ module InheritanceSpreadsheetsHelper
   def spreadsheet_of(member)
     member.spreadsheets.find_by(name: @spreadsheet.name)
   end
+
+  def calculations_of(spreadsheet)
+    table = spreadsheet.table || NullTable.new
+    table.calculations
+  end
 end
