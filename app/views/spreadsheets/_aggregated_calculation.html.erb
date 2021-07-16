@@ -22,10 +22,6 @@
 
 <%= title l(:label_calculation_summary), "#{l(:label_spreadsheet_result_plural)} #{@spreadsheet.name}"%>
 
-<%= tag.p do %>
-  <%= tag.em @spreadsheet.description %>
-<% end %>
-
 <%= tag.fieldset do %>
   <%= tag.legend do %>
     <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{l(:label_updated_time, time_tag(@spreadsheet.updated_on))})".html_safe %>
