@@ -20,7 +20,7 @@
 
 module InheritanceSpreadsheetsHelper
   def render_final_result_table(members, spreadsheet)
-    render partial: 'calculation_results',
+    render partial: 'final_calculation_results',
            locals: { table: FinalResultTable.new(members, spreadsheet) }
   end
 
@@ -41,5 +41,14 @@ module InheritanceSpreadsheetsHelper
   def calculations_of(spreadsheet)
     table = spreadsheet.table || NullTable.new
     table.calculations
+  end
+
+  def custom_field_values_of(current_row)
+    group = current_row.group_by(&:col_id)
+    cfv = group.each_with_object({}) do |(k, v), hash|
+      hash[k] = v.first ? v.first.value : ''
+      hash
+    end
+    cfv.compact
   end
 end

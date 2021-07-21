@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * spreadsheet description from aggregated results
 
+### Added
+
+* wikitoolbar to spreadsheet result row comment field
+* prefilled spreadsheet result row data fields
+
 ## 0.1.1 - 2021-07-13
 
 ### Added

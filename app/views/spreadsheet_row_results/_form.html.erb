@@ -31,7 +31,9 @@
         <%= tag.p custom_field_tag_with_label :spreadsheet_row_result, value %>
       <% end %>
     <% end %>
-    <%= tag.p f.text_field :comment, required: true %>
+    <%= tag.p f.text_area :comment, size: '6x6', required: true %>
     <%= f.hidden_field :calculation_id %>
   <% end %>
 <% end %>
+
+<%= wikitoolbar_for 'spreadsheet_row_result_comment' %>
