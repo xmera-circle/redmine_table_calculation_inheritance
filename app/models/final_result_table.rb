@@ -34,7 +34,7 @@ class FinalResultTable < MembersResultTable
   end
 
   def result_table_row(operation, column, calculation)
-    return result(calculation.id, column) if result(calculation.id, column).value
+    return result(calculation.id, column) if result(calculation.id, column).row
 
     result_value(operation, column, calculation)
   end
@@ -70,7 +70,6 @@ class FinalResultTable < MembersResultTable
                  col: column)
   end
 
-  # delete
   def spreadsheet_result_row(calculation_id)
     SpreadsheetRowResult.find_by(calculation_id: calculation_id,
                                  spreadsheet_id: spreadsheet.id)

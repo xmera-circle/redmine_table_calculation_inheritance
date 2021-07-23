@@ -40,6 +40,7 @@ class MembersResultTable < SpreadsheetResultTable
   end
 
   def member_rows(member)
+    # Observer the usage of this line. Maybe comment it out.
     return member_result_rows(member) if member_result_rows(member)
 
     member_spreadsheet_rows(member)
