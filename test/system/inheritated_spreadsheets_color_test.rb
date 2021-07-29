@@ -21,7 +21,7 @@
 require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
-  class IssueTest < ApplicationSystemTestCase
+  class InherentedSpreadsheetColorTest < ApplicationSystemTestCase
     include TableCalculationInheritance::Enumerations
     include TableCalculationInheritance::ProjectTypeCreator
     include TableCalculationInheritance::InheritatedSpreadsheets

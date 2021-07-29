@@ -41,7 +41,7 @@ module TableCalculationInheritance
       # Define table and calculation
       @first_column = TableCustomField.generate!(name: 'Name', field_format: 'string')
       @second_column = TableCustomField.generate!(name: 'Count', field_format: 'int')
-      @third_column = create_custom_field
+      @third_column = create_colored_custom_field
       table = Table.create(name: 'Equipment', description: 'IT equipment list')
       table.columns << [@first_column, @second_column, @third_column]
       @calculation = Calculation.create(name: 'Number of devices',

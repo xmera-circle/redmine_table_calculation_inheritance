@@ -23,7 +23,7 @@ module TableCalculationInheritance
   # Provide user login test
   #
   module Enumerations
-    def create_custom_field
+    def create_colored_custom_field
       custom_field = TableCustomField.generate!(
         { field_format: 'enumeration' }
       )
