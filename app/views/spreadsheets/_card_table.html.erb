@@ -37,7 +37,7 @@
             <%= content_tag(:td, calc.name, class: 'name') %>
             <% @current_row = table.result_row(calc.formula, calc) %>
             <% @current_row.each do |result| %>
-              <%= content_tag(:td, value(result.value, result.col), class: 'name') %>
+              <%= content_tag(:td, value(result.value, result.col), class: 'name', data: { color: color(result.value, result.col) }) %>
             <% end %>
           <% end %>
         <% end %>

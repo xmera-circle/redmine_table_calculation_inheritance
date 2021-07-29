@@ -21,40 +21,30 @@
 require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
-  class ProjectsControllerTest < ActionDispatch::IntegrationTest
-    extend TableCalculationInheritance::LoadFixtures
-    include TableCalculationInheritance::AuthenticateUser
+  class IssueTest < ApplicationSystemTestCase
+    include TableCalculationInheritance::Enumerations
     include TableCalculationInheritance::ProjectTypeCreator
     include TableCalculationInheritance::InheritatedSpreadsheets
-    include Redmine::I18n
 
-    fixtures :projects,
-             :members, :member_roles, :roles, :users
+    fixtures %i[projects users email_addresses roles members member_roles
+                trackers projects_trackers enabled_modules issue_statuses issues
+                enumerations custom_fields custom_values custom_fields_trackers
+                watchers journals journal_details versions
+                workflows]
 
     def setup
+      super
       setup_inheritated_spreadsheets
+      Capybara.current_session.reset!
+      log_user 'admin', 'admin'
     end
 
-    test 'should display spreadsheet card on projects overview page' do
-      log_user('jsmith', 'jsmith')
-      get project_path(@host_project.id)
-      assert :success
-      assert_select '.spreadsheet.box h3'
-      assert_select 'table.list' do
-        assert_select 'tbody tr td.name', { text: @calculation.name, count: 1 }
-        assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 1 }
-      end
-      assert_select '.icon-document', 1
-    end
-
-    test 'should not display spreadsheet card on projects overview page if not allowed to' do
-      @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @manager.allowed_to?(:view_spreadsheet_results, @host_project)
-
-      log_user('jsmith', 'jsmith')
-      get project_path(@host_project.id)
-      assert :success
-      assert_select '.spreadsheet.box h3', 0
+    test 'should render custom field enumeration color badge in result row' do
+      visit results_project_spreadsheet_path(project_id: @host_project.id, id: @spreadsheet.id)
+      expected_color = 'rgba(0, 102, 204, 1)'
+      Capybara.match = :first # since there are four badges (2 x blue, 2 x green)
+      current_color = page.find('.enumeration-badge td').style('background-color')['background-color']
+      assert_equal expected_color, current_color
     end
   end
 end

@@ -23,6 +23,8 @@ module TableCalculationInheritance
   # Create table, calculation, and spreadsheets
   #
   module InheritatedSpreadsheets
+    include TableCalculationInheritance::Enumerations
+
     def setup_inheritated_spreadsheets
       @manager = User.find(2)
       @manager_role = Role.find_by_name('Manager')
@@ -39,8 +41,9 @@ module TableCalculationInheritance
       # Define table and calculation
       @first_column = TableCustomField.generate!(name: 'Name', field_format: 'string')
       @second_column = TableCustomField.generate!(name: 'Count', field_format: 'int')
+      @third_column = create_custom_field
       table = Table.create(name: 'Equipment', description: 'IT equipment list')
-      table.columns << [@first_column, @second_column]
+      table.columns << [@first_column, @second_column, @third_column]
       @calculation = Calculation.create(name: 'Number of devices',
                                         description: 'Sum up the devices of a list',
                                         formula: 'sum',
@@ -48,20 +51,25 @@ module TableCalculationInheritance
                                         rows: false,
                                         table_id: table.id)
       @calculation.fields << @second_column
+      @calculation.fields << @third_column
       table.calculations << @calculation # sets explicitly the has_many side
 
       # Define spreadsheet
       [@guest_project, @host_project].each do |project|
-        spreadsheet = Spreadsheet.create(name: 'Equipment list',
+        @spreadsheet = Spreadsheet.create(name: 'Equipment list',
                                           description: "Required Equipment for #{project.name}",
                                           project_id: project.id,
                                           author_id: @manager.id,
                                           table_id: table.id)
-        first_row = SpreadsheetRow.create(spreadsheet_id: spreadsheet.id, position: 1)
-        first_row.custom_field_values = { @first_column.id => 'Laptop', @second_column.id => 12 }
+        first_row = SpreadsheetRow.create(spreadsheet_id: @spreadsheet.id, position: 1)
+        first_row.custom_field_values = { @first_column.id => 'Laptop',
+                                          @second_column.id => 12,
+                                          @third_column.id => 1 }
         first_row.save
-        second_row = SpreadsheetRow.create(spreadsheet_id: spreadsheet.id, position: 2)
-        second_row.custom_field_values = { @first_column.id => 'Smartphone', @second_column.id => 5 } 
+        second_row = SpreadsheetRow.create(spreadsheet_id: @spreadsheet.id, position: 2)
+        second_row.custom_field_values = { @first_column.id => 'Smartphone',
+                                           @second_column.id => 5,
+                                           @third_column.id => 1 }
         second_row.save
       end
     end

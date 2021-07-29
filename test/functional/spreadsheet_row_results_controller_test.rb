@@ -46,7 +46,7 @@ module TableCaclulationInheritance
       assert :success
 
       assert_select '.box.tabular.settings', 1
-      assert_select 'p', 2
+      assert_select 'p', 3
     end
 
     test 'should render new when allowed to' do
@@ -61,7 +61,7 @@ module TableCaclulationInheritance
       assert :success
 
       assert_select '.box.tabular.settings', 1
-      assert_select 'p', 2
+      assert_select 'p', 3
     end
 
     test 'should not render new when allowed to' do
