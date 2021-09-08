@@ -36,7 +36,7 @@ module TableCalculationInheritance
         def index
           super
           @guests = @project.guests
-          @members = @project.guests#.prepend(@project)
+          @members = @project.guests.prepend(@project)
         end
 
         ##

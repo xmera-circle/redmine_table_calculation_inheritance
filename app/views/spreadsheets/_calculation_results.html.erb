@@ -52,12 +52,12 @@
                 <% end %>
               <% end %>
             <% elsif table.is_a?(MembersResultTable) %>
+              <% @row_id = SpreadsheetRowResult.find_by(calculation_id: calc.id,spreadsheet_id: @spreadsheet.id) %>
               <%= tag.td class: 'buttons' do %>
-                <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) %>
-                  <% @row_id = SpreadsheetRowResult.find_by(calculation_id: calc.id,spreadsheet_id: @spreadsheet.id) %>
+                <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) && @row_id.present? %>  
                   <% cfv = custom_field_values_of(@current_row) %>
                   <%= link_to l(:label_inherit),
-                              (@row_id.present? ? spreadsheet_row_result_path(@row_id, calculation_id: calc.id, cfv: cfv) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_id: calc)), 
+                              spreadsheet_row_result_path(@row_id, calculation_id: calc.id, cfv: cfv), 
                               method: @row_id.present? ? :patch : :get,
                               class: 'icon icon-checked',
                               title: l(:label_inherit) %>

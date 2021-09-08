@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * wiki formatting to spreadsheet description
+* inheritation button for accepting the current calculated result as final result
 
 ### Fixed
 
