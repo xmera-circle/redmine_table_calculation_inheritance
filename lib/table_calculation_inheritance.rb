@@ -21,4 +21,3 @@
 require 'table_calculation_inheritance/patches/spreadsheet_patch'
 require 'table_calculation_inheritance/patches/spreadsheet_result_table_patch'
 require 'table_calculation_inheritance/patches/spreadsheets_controller_patch'
-require 'table_calculation_inheritance/hooks/view_projects_show_right_hook_listener'
