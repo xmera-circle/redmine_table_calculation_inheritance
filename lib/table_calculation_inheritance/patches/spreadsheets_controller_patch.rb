@@ -35,7 +35,8 @@ module TableCalculationInheritance
         #
         def index
           super
-          @guests = @project.guests
+          # it may happen, that a project is included in guests, for unkown reasons yet
+          @guests = @project.guests - [@project]
           @members = @project.guests.prepend(@project)
         end
 
