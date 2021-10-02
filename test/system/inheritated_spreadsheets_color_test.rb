@@ -35,6 +35,7 @@ module TableCaclulationInheritance
     def setup
       super
       setup_inheritated_spreadsheets
+      add_spreadsheet_row_result(@guest_project)
       Capybara.current_session.reset!
       log_user 'admin', 'admin'
     end

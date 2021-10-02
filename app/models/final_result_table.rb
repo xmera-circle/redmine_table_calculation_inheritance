@@ -25,11 +25,10 @@
 #
 class FinalResultTable < MembersResultTable
   include Redmine::I18n
-  attr_reader :spreadsheet, :row, :comment_field_name
+  attr_reader :row, :comment_field_name
 
-  def initialize(members, spreadsheet)
-    super(members, spreadsheet)
-    @spreadsheet = spreadsheet # delete
+  def initialize(guests, project, spreadsheet)
+    super(guests, project, spreadsheet)
     @comment_field_name = Struct.new(:name)
   end
 

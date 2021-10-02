@@ -1,2 +1,4 @@
 en:
   label_inherit: Inherit
+  permission_view_spreadsheet_results: View calcualation results
+  permission_edit_spreadsheet_results: Edit calculation results 

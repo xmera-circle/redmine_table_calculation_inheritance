@@ -19,19 +19,24 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 module InheritanceSpreadsheetsHelper
-  def render_final_result_table(members, spreadsheet)
+  def render_final_result_table(guests, project, spreadsheet)
     render partial: 'final_calculation_results',
-           locals: { table: FinalResultTable.new(members, spreadsheet) }
+           locals: { table: FinalResultTable.new(guests, project, spreadsheet) }
   end
 
-  def render_members_result_table(members, spreadsheet)
-    render partial: 'calculation_results',
-           locals: { table: MembersResultTable.new(members, spreadsheet) }
+  def render_members_result_table(guests, project, spreadsheet)
+    render partial: 'members_calculation_results',
+           locals: { table: MembersResultTable.new(guests, project, spreadsheet) }
   end
 
-  def render_card_table(members, spreadsheet)
+  def render_member_result_table(member, spreadsheet)
+    render partial: 'member_calculation_results',
+           locals: { table: MemberResultTable.new(member, spreadsheet) }
+  end
+
+  def render_card_table(guests, project, spreadsheet)
     render partial: 'spreadsheets/card_table',
-           locals: { table: FinalResultTable.new(members, spreadsheet) }
+           locals: { table: FinalResultTable.new(guests, project, spreadsheet) }
   end
 
   def spreadsheet_of(member)
