@@ -37,6 +37,10 @@ module TableCaclulationInheritance
 
     test 'should display spreadsheet card on projects overview page' do
       log_user('jsmith', 'jsmith')
+      # confirm guest result to be used in aggregation
+      check_guest_project_permissions
+      confirm_guest_results
+
       get project_path(@host_project.id)
       assert :success
       assert_select '.spreadsheet.box h3'
@@ -49,7 +53,7 @@ module TableCaclulationInheritance
 
     test 'should not display spreadsheet card on projects overview page if not allowed to' do
       @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @manager.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert_not @user.allowed_to?(:view_spreadsheet_results, @host_project)
 
       log_user('jsmith', 'jsmith')
       get project_path(@host_project.id)
