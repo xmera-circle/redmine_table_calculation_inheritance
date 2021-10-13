@@ -46,7 +46,7 @@
 
     <%= tag.p textilizable spreadsheet.description %>
     <% if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
-      <%= render_card_table(members, spreadsheet) if calculations_of(spreadsheet).present? %>
+      <%= render_card_table(guests, project, spreadsheet) if calculations_of(spreadsheet).present? %>
     <% end %>
     <%= tag.small do %>
       <%= authoring spreadsheet.created_on, spreadsheet.author %>.

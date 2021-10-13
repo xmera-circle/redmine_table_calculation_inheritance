@@ -36,11 +36,26 @@ module TableCaclulationInheritance
     end
 
     test 'should show aggregated results' do
-      assert @manager.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:view_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
       log_user('jsmith', 'jsmith')
+      get results_project_spreadsheet_path(id: spreadsheet.id, project_id: @host_project.id)
+      assert_response :success
+      assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{spreadsheet.name}"
+      assert_select '#content fieldset legend strong', 3
+      assert_select 'tbody tr td.name', { text: @calculation.name, count: 4 }
+      assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 0 }
+      assert_select 'tbody tr td:nth-of-type(2)', { text: /17/, count: 3 }
+      assert_select 'fieldset.collapsible' do
+        assert_select 'tbody tr td:nth-of-type(2)', { text: /17/, count: 1 }
+      end
+
+      # confirm guest result to be used in aggregation
+      check_guest_project_permissions
+      confirm_guest_results
+
       get results_project_spreadsheet_path(id: spreadsheet.id, project_id: @host_project.id)
       assert_response :success
       assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{spreadsheet.name}"
@@ -54,7 +69,7 @@ module TableCaclulationInheritance
 
     test 'should response 403 if not allowed to view aggregated results' do
       @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @manager.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert_not @user.allowed_to?(:view_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -65,8 +80,8 @@ module TableCaclulationInheritance
 
     test 'should show link to edit aggregated results' do
       @manager_role.add_permission!(:edit_spreadsheet_results)
-      assert @manager.allowed_to?(:view_spreadsheet_results, @host_project)
-      assert @manager.allowed_to?(:edit_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:edit_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -77,8 +92,8 @@ module TableCaclulationInheritance
     end
 
     test 'should show no link to edit aggregated results if not allowed to' do
-      assert @manager.allowed_to?(:view_spreadsheet_results, @host_project)
-      assert_not @manager.allowed_to?(:edit_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert_not @user.allowed_to?(:edit_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -90,11 +105,15 @@ module TableCaclulationInheritance
 
     test 'should show aggregated result in the card on spreadsheets main page' do
       @manager_role.add_permission!(:edit_spreadsheet_results)
-      assert @manager.allowed_to?(:view_spreadsheet_results, @host_project)
-      assert @manager.allowed_to?(:edit_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert @user.allowed_to?(:edit_spreadsheet_results, @host_project)
       assert @host_project.guests.present?
 
       log_user('jsmith', 'jsmith')
+      # confirm guest result to be used in aggregation
+      check_guest_project_permissions
+      confirm_guest_results
+
       get project_spreadsheets_path(project_id: @host_project.id)
       assert_response :success
       assert_select '.spreadsheet.box h3'
@@ -107,7 +126,7 @@ module TableCaclulationInheritance
 
     test 'should not show results in card on spreadsheets main page if not allowed to' do
       @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @manager.allowed_to?(:view_spreadsheet_results, @host_project)
+      assert_not @user.allowed_to?(:view_spreadsheet_results, @host_project)
       assert @host_project.guests.present?
 
       log_user('jsmith', 'jsmith')

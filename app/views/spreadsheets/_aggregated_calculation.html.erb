@@ -26,14 +26,14 @@
   <%= tag.legend do %>
     <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{l(:label_updated_time, time_tag(@spreadsheet.updated_on))})".html_safe %>
   <% end %>
-  <%= render_final_result_table(@members, @spreadsheet) %>
+  <%= render_final_result_table(@guests, @project, @spreadsheet) %>
 <% end %>
 
 <%= tag.fieldset do %>
   <%= tag.legend do %>
     <%= tag.strong l(:label_aggregated_result_plural) %>
   <% end %>
-  <%= render_members_result_table(@members, @spreadsheet) %>
+  <%= render_members_result_table(@guests, @project, @spreadsheet) %>
 <% end %>
 
 <fieldset class="collapsible collapsed" style="padding: 0;">
@@ -44,7 +44,11 @@
     <% spreadsheet = spreadsheet_of(member) %>
     <% unless spreadsheet.nil? %>
       <%= tag.h3 link_to("#{member.project_type.name} - #{member.name}",project_spreadsheet_path(member, spreadsheet) ), style: 'margin-top: 1rem; font-weight:bold'%>
-      <%= render_spreadsheet_result_table(spreadsheet) %>                                               
+      <% if member.id == @project.id %>
+        <%= render_spreadsheet_result_table(spreadsheet) %>
+      <% else %>
+        <%= render_member_result_table(member, spreadsheet) %>
+      <% end %>                                           
     <% end %>
   <% end %>
 </fieldset>

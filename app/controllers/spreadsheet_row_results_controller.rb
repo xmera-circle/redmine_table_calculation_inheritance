@@ -55,6 +55,9 @@ class SpreadsheetRowResultsController < ApplicationController
   def edit; end
 
   def update
+    @spreadsheet_row_result.safe_attributes = {
+      custom_field_values: params[:cfv] || {}
+    }
     @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
     if @spreadsheet_row_result.save
       respond_to do |format|
