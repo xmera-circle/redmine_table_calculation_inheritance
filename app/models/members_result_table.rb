@@ -19,45 +19,43 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class MembersResultTable < SpreadsheetResultTable
-  attr_reader :name, :members
+  attr_reader :name, :guests, :project
 
-  def initialize(members, spreadsheet)
+  def initialize(guests, project, spreadsheet)
+    @guests = guests
+    @project = project
     @name = spreadsheet.name
-    @members = members
     super(spreadsheet)
   end
 
   ##
-  # Rows are collected over member spreadsheets. Hence,
+  # Rows are collected over guest spreadsheets. Hence,
   # all calculations will be based on these rows.
   #
   def rows(_calculation_id = nil)
-    collection = []
-    members.each do |member|
-      collection << member_rows(member)
+    collection = project_spreadsheet_rows
+    guests.each do |guest|
+      collection << guest_rows(guest)
     end
     collection.flatten.compact
   end
 
-  def member_rows(member)
-    # Observer the usage of this line. Maybe comment it out.
-    return member_result_rows(member) if member_result_rows(member)
-
-    member_spreadsheet_rows(member)
+  def guest_rows(guest)
+    guest_result_rows(guest)
   end
 
-  def member_result_rows(member)
-    results = spreadsheet_of(member)&.result_rows&.split&.flatten
+  def guest_result_rows(guest)
+    results = spreadsheet_of(guest)&.result_rows&.split&.flatten
     results.present? ? results : nil
   end
 
-  def member_spreadsheet_rows(member)
-    spreadsheet_of(member)&.rows&.split&.flatten
+  def project_spreadsheet_rows
+    spreadsheet&.rows&.split&.flatten
   end
 
   private
 
-  def spreadsheet_of(member)
-    member.spreadsheets.find_by(name: name)
+  def spreadsheet_of(guest)
+    guest.spreadsheets.find_by(name: name)
   end
 end

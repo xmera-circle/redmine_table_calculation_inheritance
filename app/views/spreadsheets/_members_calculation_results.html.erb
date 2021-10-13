@@ -1,0 +1,72 @@
+<%
+# frozen_string_literal: true
+
+# This file is part of the Plugin Redmine Table Calculation.
+#
+# Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
+#
+# This plugin program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+%>
+
+<% if table.calculations.present? %>
+  <%= tag.p do %>
+    <%= content_tag :table, class: 'list' do %>
+      <%= content_tag :thead do %>
+        <%= content_tag :tr do %>
+          <%= content_tag(:th, l(:label_calculation), class: 'name') %>
+          <% table.columns.each do |column| %>
+            <%= content_tag(:th, column.name, class: 'name') %>
+          <% end %>
+          <% if table.is_a?(FinalResultTable) || table.is_a?(MembersResultTable) %>
+            <%= content_tag(:th, '') %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= content_tag :tbody do %>
+        <% table.calculations.each do |calc| %> 
+          <%= content_tag :tr do %>
+            <%= content_tag(:td, calc.name, class: 'name') %>
+            <% @current_row = table.result_row(calc.formula, calc) %>
+            <% @current_row.each do |result| %>
+              <%= content_tag(:td, value(result.value, result.col), class: 'name', data: { color: color(result.value, result.col) }) %>
+            <% end %>
+            <% if table.is_a?(FinalResultTable) %>
+              <%= tag.td class: 'buttons' do %>
+                <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) %>
+                  <% @row_id = @current_row.map(&:row_id).compact.uniq.join %>
+                  <%= link_to l(:button_edit),
+                              (@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_id: calc)), 
+                              :class => 'icon icon-edit' %>
+                <% end %>
+              <% end %>
+            <% elsif table.is_a?(MembersResultTable) %>
+              <% @row_id = SpreadsheetRowResult.find_by(calculation_id: calc.id,spreadsheet_id: @spreadsheet.id) %>
+              <%= tag.td class: 'buttons' do %>
+                <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) && @row_id.present? %>  
+                  <% cfv = custom_field_values_of(@current_row) %>
+                  <%= link_to l(:label_inherit),
+                              spreadsheet_row_result_path(@row_id, calculation_id: calc.id, cfv: cfv), 
+                              method: @row_id.present? ? :patch : :get,
+                              class: 'icon icon-checked',
+                              title: l(:label_inherit) %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

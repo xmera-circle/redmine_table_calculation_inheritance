@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation.
+# This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
 # Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
 #
-# This program is free software; you can redistribute it and/or
+# This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
@@ -18,16 +18,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCaclulationInheritance
-  module Hooks
-    class ViewProjectsShowRightHookListener < ProjectTypesRelations::Hooks::ViewProjectsShowRightHookListener
-      def view_projects_show_right(context = {})
-        super
-        context[:controller].send :render_to_string, {
-          partial: 'projects/favorite_spreadsheet',
-          locals: context
-        }
-      end
-    end
+class MemberResultTable < SpreadsheetResultTable
+  attr_reader :name, :member
+
+  def initialize(member, spreadsheet)
+    @name = spreadsheet.name
+    @member = member
+    super(spreadsheet)
+  end
+
+  ##
+  # Rows are collected over member spreadsheets. Hence,
+  # all calculations will be based on these rows.
+  #
+  def rows(_calculation_id = nil)
+    collection = []
+    collection << member_rows
+    collection.flatten.compact
+  end
+
+  def member_rows
+    member_result_rows
+  end
+
+  def member_result_rows
+    results = spreadsheet&.result_rows&.split&.flatten
+    results.present? ? results : nil
   end
 end

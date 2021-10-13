@@ -1,1 +1,4 @@
 de:
+  label_inherit: Übernehmen
+  permission_view_spreadsheet_results: Berechnungsergebnisse anzeigen
+  permission_edit_spreadsheet_results: Berechnungsergebnisse bearbeiten

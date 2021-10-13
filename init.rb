@@ -24,13 +24,18 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   name 'Redmine Table Calculation Inheritance'
   author 'Liane Hampe, xmera'
   description 'Calculate spreadsheet results cross project'
-  version '0.1.1'
+  version '0.2.0'
   url 'https://circle.xmera.de/projects/redmine-table-calculation-inheritance'
   author_url 'http://xmera.de'
 
   requires_redmine version_or_higher: '4.1.0'
   requires_redmine_plugin :redmine_table_calculation, version_or_higher: '0.1.0'
   requires_redmine_plugin :redmine_project_types_relations, version_or_higher: '2.0.0'
+
+  project_module :table_calculation do
+    permission :view_spreadsheet_results, { spreadsheets: %i[results index] }
+    permission :edit_spreadsheet_results, { spreadsheet_row_results: %i[new create edit update] }
+  end
 end
 
 ActiveSupport::Reloader.to_prepare do
