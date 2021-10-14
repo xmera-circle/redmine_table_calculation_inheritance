@@ -1,4 +1,11 @@
 en:
   label_inherit: Inherit
+  label_spreadsheet_row_result: Result - %{value}
+  label_spreadsheet_result_plural: Results
+  label_spreadsheet_result: Result
+  label_adjusted_result_plural: Final Results
+  label_aggregated_result_plural: Calculated Results
+  label_single_calculation_results: Single Calculation Results
+
   permission_view_spreadsheet_results: View calcualation results
   permission_edit_spreadsheet_results: Edit calculation results 

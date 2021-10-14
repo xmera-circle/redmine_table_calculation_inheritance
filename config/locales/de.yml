@@ -1,4 +1,11 @@
 de:
   label_inherit: Übernehmen
+  label_spreadsheet_row_result: Ergebnis - %{value}
+  label_spreadsheet_result_plural: Ergebnisse
+  label_spreadsheet_result: Ergebnis
+  label_adjusted_result_plural: Endergebnisse
+  label_aggregated_result_plural: Berechnete Ergebnisse
+  label_single_calculation_results: Einzelne Berechnungsergebnisse
+
   permission_view_spreadsheet_results: Berechnungsergebnisse anzeigen
   permission_edit_spreadsheet_results: Berechnungsergebnisse bearbeiten
