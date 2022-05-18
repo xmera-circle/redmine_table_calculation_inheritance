@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   name 'Redmine Table Calculation Inheritance'
   author 'Liane Hampe, xmera'
   description 'Calculate spreadsheet results cross project'
-  version '0.2.0'
+  version '0.2.1'
   url 'https://circle.xmera.de/projects/redmine-table-calculation-inheritance'
   author_url 'http://xmera.de'
 
