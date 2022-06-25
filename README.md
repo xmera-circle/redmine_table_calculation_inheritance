@@ -2,7 +2,7 @@
 
 Calculate spreadsheet results cross project
 
-![Redmine Plugin Version](https://img.shields.io/badge/Redmine_Plugin-v0.2.2-red) ![Redmine Version](https://img.shields.io/badge/Redmine-v4.x.x-blue) ![Language Support](https://img.shields.io/badge/Languages-en,_de-green) ![Version Stage](https://img.shields.io/badge/Stage-development-important)
+![Redmine Plugin Version](https://img.shields.io/badge/Redmine_Plugin-v0.2.3-red) ![Redmine Version](https://img.shields.io/badge/Redmine-v4.x.x-blue) ![Language Support](https://img.shields.io/badge/Languages-en,_de-green) ![Version Stage](https://img.shields.io/badge/Stage-development-important)
 
 Redmine Table Calculation Inheritance is a plugin which allows to calculate cross project based on spreadsheet results as provided by the Redmine Table Calculation plugin.
 
