@@ -46,7 +46,9 @@ module TableCaclulationInheritance
       assert :success
 
       assert_select '.box.tabular.settings', 1
-      assert_select 'p', 3
+      assert_select '#spreadsheet_row_result_custom_field_values_2'
+      assert_select '#spreadsheet_row_result_custom_field_values_3'
+      assert_select '#spreadsheet_row_result_comment'
     end
 
     test 'should render new when allowed to' do
@@ -61,7 +63,9 @@ module TableCaclulationInheritance
       assert :success
 
       assert_select '.box.tabular.settings', 1
-      assert_select 'p', 3
+      assert_select '#spreadsheet_row_result_custom_field_values_2'
+      assert_select '#spreadsheet_row_result_custom_field_values_3'
+      assert_select '#spreadsheet_row_result_comment'
     end
 
     test 'should not render new when allowed to' do
