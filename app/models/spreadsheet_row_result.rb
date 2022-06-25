@@ -39,6 +39,13 @@ class SpreadsheetRowResult < ActiveRecord::Base
     :comment
   )
 
+  ##
+  # Is required by ApplicationHelpers#format_object.
+  #
+  def visible?
+    true
+  end
+
   def available_custom_fields
     CustomField.where(id: column_ids).sorted.to_a
   end
