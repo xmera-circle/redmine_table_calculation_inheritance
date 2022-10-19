@@ -46,6 +46,7 @@ module TableCalculationInheritance
       @first_column = TableCustomField.generate!(name: 'Name', field_format: 'string')
       @second_column = TableCustomField.generate!(name: 'Count', field_format: 'int')
       @third_column = create_colored_custom_field
+      @third_column_values = @third_column.enumerations.pluck(:id)
       table = Table.create(name: 'Equipment', description: 'IT equipment list')
       table.columns << [@first_column, @second_column, @third_column]
       @calculation = Calculation.create(name: 'Number of devices',
@@ -68,12 +69,12 @@ module TableCalculationInheritance
         first_row = SpreadsheetRow.create(spreadsheet_id: @spreadsheet.id, position: 1)
         first_row.custom_field_values = { @first_column.id => 'Laptop',
                                           @second_column.id => 12,
-                                          @third_column.id => 1 }
+                                          @third_column.id => @third_column_values.first }
         first_row.save
         second_row = SpreadsheetRow.create(spreadsheet_id: @spreadsheet.id, position: 2)
         second_row.custom_field_values = { @first_column.id => 'Smartphone',
                                            @second_column.id => 5,
-                                           @third_column.id => 1 }
+                                           @third_column.id => @third_column_values.first }
         second_row.save
       end
     end
@@ -90,7 +91,7 @@ module TableCalculationInheritance
                                            spreadsheet_id: project.spreadsheets.take.id,
                                            calculation_id: @calculation.id,
                                            comment: '-')
-      result.custom_field_values = { @second_column.id => '17',
+      result.custom_field_values = { @second_column.id => 17,
                                      @third_column.id => 2 }
       result.save
     end
@@ -119,7 +120,7 @@ module TableCalculationInheritance
     def spreadsheet_row_result_params
       { spreadsheet_row_result: {
         custom_field_values: {
-          @second_column.id => '17'
+          @second_column.id => 17
         },
         comment: '-'
       } }
