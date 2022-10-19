@@ -30,9 +30,9 @@ module TableCaclulation
 
     def setup
       @table = Table.generate!
-      Spreadsheet.generate!(project_id: Project.find(1).id,
-                            author_id: User.find(2).id,
-                            table_id: @table.id)
+      @spreadsheet = Spreadsheet.generate!(project_id: Project.find(1).id,
+                                           author_id: User.find(2).id,
+                                           table_id: @table.id)
     end
 
     test 'should have many custom values' do
@@ -48,7 +48,7 @@ module TableCaclulation
     test 'should find TableCustomField instances' do
       cf = custom_field
       @table.columns << cf
-      row = SpreadsheetRowResult.new(spreadsheet_id: 1)
+      row = SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id)
       assert row.available_custom_fields.count == 1
     end
 
