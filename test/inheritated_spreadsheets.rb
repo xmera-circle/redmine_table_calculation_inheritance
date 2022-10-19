@@ -92,7 +92,7 @@ module TableCalculationInheritance
                                            calculation_id: @calculation.id,
                                            comment: '-')
       result.custom_field_values = { @second_column.id => 17,
-                                     @third_column.id => 2 }
+                                     @third_column.id => @third_column_values.second }
       result.save
     end
 
