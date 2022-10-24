@@ -42,7 +42,7 @@ module TableCaclulationInheritance
 
     test 'should render custom field enumeration color badge in result row' do
       visit results_project_spreadsheet_path(project_id: @host_project.id, id: @spreadsheet.id)
-      expected_color = 'rgba(0, 102, 204, 1)'
+      expected_color = 'rgba(0, 102, 204, 1)' # blue
       Capybara.match = :first # since there are four badges (2 x blue, 2 x green)
       current_color = page.find('.enumeration-badge td').style('background-color')['background-color']
       assert_equal expected_color, current_color
