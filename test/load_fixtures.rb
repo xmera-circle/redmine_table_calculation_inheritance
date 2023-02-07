@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
+module RedmineTableCalculationInheritance
   ##
   # Redmine cannot load plugin fixtures by default.
   # This module loads first plugin fixtures and then Redmine fixtures

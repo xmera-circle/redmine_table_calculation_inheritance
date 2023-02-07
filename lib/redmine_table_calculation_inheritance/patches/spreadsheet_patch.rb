@@ -18,5 +18,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-require 'table_calculation_inheritance/patches/spreadsheet_patch'
-require 'table_calculation_inheritance/patches/spreadsheets_controller_patch'
+module RedmineTableCalculationInheritance
+  module Patches
+    module SpreadsheetPatch
+      def self.prepended(base)
+        base.class_eval do
+          has_many :result_rows, class_name: 'SpreadsheetRowResult', dependent: :destroy
+        end
+      end
+    end
+  end
+end
+

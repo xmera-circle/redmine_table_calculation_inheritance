@@ -22,10 +22,10 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
   class ProjectsControllerTest < ActionDispatch::IntegrationTest
-    extend TableCalculationInheritance::LoadFixtures
-    include TableCalculationInheritance::AuthenticateUser
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::InheritatedSpreadsheets
+    extend RedmineTableCalculationInheritance::LoadFixtures
+    include RedmineTableCalculationInheritance::AuthenticateUser
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
     include Redmine::I18n
 
     fixtures :projects,
@@ -43,6 +43,7 @@ module TableCaclulationInheritance
 
       get project_path(@host_project.id)
       assert :success
+
       assert_select '.spreadsheet.box h3'
       assert_select 'table.list' do
         assert_select 'tbody tr td.name', { text: @calculation.name, count: 1 }

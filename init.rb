@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-require_dependency 'table_calculation_inheritance'
+require File.expand_path('lib/redmine_table_calculation_inheritance', __dir__)
 
 Redmine::Plugin.register :redmine_table_calculation_inheritance do
   name 'Redmine Table Calculation Inheritance'
@@ -38,6 +38,4 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   end
 end
 
-ActiveSupport::Reloader.to_prepare do
-  ProjectsController.send :helper, InheritanceSpreadsheetsHelper
-end
+RedmineTableCalculationInheritance.setup
