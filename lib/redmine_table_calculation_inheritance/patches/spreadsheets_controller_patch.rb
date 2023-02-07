@@ -18,21 +18,35 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
+module RedmineTableCalculationInheritance
   module Patches
-    module SpreadsheetPatch
+    module SpreadsheetsControllerPatch
       def self.prepended(base)
+        base.prepend InstanceMethods
         base.class_eval do
-          has_many :result_rows, class_name: 'SpreadsheetRowResult', dependent: :destroy
+          helper :inheritance_spreadsheets
+        end
+      end
+
+      module InstanceMethods
+        ##
+        # Adds the required project type relations needed for inheritated
+        # calculations.
+        #
+        def index
+          super
+          # it may happen, that a project is included in guests, for unkown reasons yet
+          @guests = @project.guests - [@project]
+          @members = @project.guests.prepend(@project)
+        end
+
+        ##
+        # Refers to the instance variables in SpreadsheetsController#index
+        #
+        def results
+          index
         end
       end
     end
-  end
-end
-
-# Apply patch
-Rails.configuration.to_prepare do
-  unless Spreadsheet.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetPatch)
-    Spreadsheet.prepend TableCalculationInheritance::Patches::SpreadsheetPatch
   end
 end

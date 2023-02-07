@@ -22,10 +22,10 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
   class SpreadsheetsControllerTest < ActionDispatch::IntegrationTest
-    extend TableCalculationInheritance::LoadFixtures
-    include TableCalculationInheritance::AuthenticateUser
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::InheritatedSpreadsheets
+    extend RedmineTableCalculationInheritance::LoadFixtures
+    include RedmineTableCalculationInheritance::AuthenticateUser
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
     include Redmine::I18n
 
     fixtures :projects,
@@ -99,6 +99,7 @@ module TableCaclulationInheritance
 
       log_user('jsmith', 'jsmith')
       get results_project_spreadsheet_path(id: spreadsheet.id, project_id: @host_project.id)
+
       assert_response :success
       assert_select 'a[href*=?]', '/spreadsheet_row_results/', { text: l(:button_edit), count: 0 }
     end

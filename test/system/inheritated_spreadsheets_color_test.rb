@@ -22,9 +22,9 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
   class InherentedSpreadsheetColorTest < ApplicationSystemTestCase
-    include TableCalculationInheritance::Enumerations
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::InheritatedSpreadsheets
+    include RedmineTableCalculationInheritance::Enumerations
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
 
     fixtures %i[projects users email_addresses roles members member_roles
                 trackers projects_trackers enabled_modules issue_statuses issues

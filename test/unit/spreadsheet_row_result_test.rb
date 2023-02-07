@@ -22,9 +22,9 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulation
   class SpreadsheetRowResultTest < ActiveSupport::TestCase
-    extend TableCalculationInheritance::LoadFixtures
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::TestObjectCreators
+    extend RedmineTableCalculationInheritance::LoadFixtures
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::TestObjectCreators
 
     fixtures :projects, :users
 

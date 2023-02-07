@@ -22,10 +22,10 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
   class SpreadsheetsRowResultsControllerTest < ActionDispatch::IntegrationTest
-    extend TableCalculationInheritance::LoadFixtures
-    include TableCalculationInheritance::AuthenticateUser
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::InheritatedSpreadsheets
+    extend RedmineTableCalculationInheritance::LoadFixtures
+    include RedmineTableCalculationInheritance::AuthenticateUser
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
     include Redmine::I18n
 
     fixtures :projects,
