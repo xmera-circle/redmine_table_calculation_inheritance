@@ -36,7 +36,7 @@
 
     <%= tag.h3 class: 'icon icon-document' do %>
       <%= link_to spreadsheet.name, project_spreadsheet_path(@project, id: spreadsheet) %>&nbsp;
-      <% if calculations_of(spreadsheet).present? %>
+      <% if calculations_of(spreadsheet).present? && calculations_of(spreadsheet).any?(&:inheritable?) %>
         <%= link_to l(:label_calculation_details),
               results_project_spreadsheet_path(@project, id: spreadsheet),
               class: 'icon-only icon-zoom-in',
