@@ -24,7 +24,7 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   name 'Redmine Table Calculation Inheritance'
   author 'Liane Hampe, xmera'
   description 'Calculate spreadsheet results cross project'
-  version '0.2.4'
+  version '0.2.5'
   url 'https://circle.xmera.de/projects/redmine-table-calculation-inheritance'
   author_url 'http://xmera.de'
 
