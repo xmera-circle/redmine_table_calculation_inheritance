@@ -33,15 +33,17 @@ class FinalResultTable < MembersResultTable
   end
 
   def result_table_row(operation, column, calculation)
-    return result(calculation.id, column) if result(calculation.id, column).row
+    calc_result = result(calculation.id, column)
+    return calc_result if calc_result.row
 
     result_value(operation, column, calculation)
   end
 
   def columns
-    return if instance_variable_get('@columns').include? comment_field
+    cols = instance_variable_get(:@columns)
+    return if cols.include? comment_field
 
-    instance_variable_get('@columns').append(comment_field)
+    cols.append(comment_field)
   end
 
   private

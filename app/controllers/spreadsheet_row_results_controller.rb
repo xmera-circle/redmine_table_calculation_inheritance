@@ -41,6 +41,8 @@ class SpreadsheetRowResultsController < ApplicationController
     }
   end
 
+  def edit; end
+
   def create
     @spreadsheet_row_result ||= new_row
     @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
@@ -52,23 +54,14 @@ class SpreadsheetRowResultsController < ApplicationController
     end
   end
 
-  def edit; end
-
   def update
-    @spreadsheet_row_result.safe_attributes = {
-      custom_field_values: params[:cfv] || {}
-    }
-    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
-    if @spreadsheet_row_result.save
-      respond_to do |format|
-        format.html do
+    update_row_result_attributes
+    respond_to do |format|
+      format.html do
+        if @spreadsheet_row_result.save
           flash[:notice] = l(:notice_successful_update)
           redirect_to results_project_spreadsheet_path @project, @spreadsheet
-        end
-      end
-    else
-      respond_to do |format|
-        format.html do
+        else
           edit
           render action: 'edit'
         end
@@ -82,6 +75,13 @@ class SpreadsheetRowResultsController < ApplicationController
   end
 
   private
+
+  def update_row_result_attributes
+    @spreadsheet_row_result.safe_attributes = {
+      custom_field_values: params[:cfv] || {}
+    }
+    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
+  end
 
   def new_row
     SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id,
