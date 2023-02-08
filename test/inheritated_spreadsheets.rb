@@ -54,6 +54,7 @@ module RedmineTableCalculationInheritance
                                         formula: 'sum',
                                         columns: true,
                                         rows: false,
+                                        inheritable: true,
                                         table_id: table.id)
       @calculation.fields << @second_column
       @calculation.fields << @third_column
