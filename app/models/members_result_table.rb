@@ -46,7 +46,7 @@ class MembersResultTable < SpreadsheetResultTable
 
   def guest_result_rows(guest)
     results = spreadsheet_of(guest)&.result_rows&.split&.flatten
-    results.present? ? results : nil
+    results.presence
   end
 
   def project_spreadsheet_rows

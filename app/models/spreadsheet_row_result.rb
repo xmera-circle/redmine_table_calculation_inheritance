@@ -28,7 +28,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
 
   after_destroy :destroy_adapted_row_values
 
-  validates_presence_of :comment
+  validates :comment, presence: true
 
   safe_attributes(
     :author_id,

@@ -43,6 +43,6 @@ class MemberResultTable < SpreadsheetResultTable
 
   def member_result_rows
     results = spreadsheet&.result_rows&.split&.flatten
-    results.present? ? results : nil
+    results.presence
   end
 end
