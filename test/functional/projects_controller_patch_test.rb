@@ -46,7 +46,7 @@ module TableCaclulationInheritance
 
       assert_select '.spreadsheet.box h3'
       assert_select 'table.list' do
-        assert_select 'tbody tr td.name', { text: @calculation.name, count: 1 }
+        assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 1 }
         assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 1 }
       end
       assert_select '.icon-document', 1

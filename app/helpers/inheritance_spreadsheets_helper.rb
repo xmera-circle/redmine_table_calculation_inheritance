@@ -44,8 +44,8 @@ module InheritanceSpreadsheetsHelper
   end
 
   def calculations_of(spreadsheet)
-    table = spreadsheet.table || NullTable.new
-    table.calculations
+    table_config = spreadsheet.table_config || NullTableConfig.new
+    table_config.calculation_configs
   end
 
   def custom_field_values_of(current_row)

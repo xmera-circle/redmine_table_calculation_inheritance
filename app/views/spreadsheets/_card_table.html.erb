@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<% if table.calculations.present? && table.calculations.any?(&:inheritable?) %>
+<% if table.calculation_configs.present? && table.calculation_configs.any?(&:inheritable?) %>
   <%= tag.p do %>
     <%= content_tag :table, class: 'list' do %>
       <%= content_tag :head do %>
@@ -32,7 +32,7 @@
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
-        <% table.calculations.each do |calc| %> 
+        <% table.calculation_configs.each do |calc| %> 
           <%= content_tag :tr do %>
             <%= content_tag(:td, calc.name, class: 'name') %>
             <% @current_row = table.result_row(calc.formula, calc) %>

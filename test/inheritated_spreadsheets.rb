@@ -47,18 +47,16 @@ module RedmineTableCalculationInheritance
       @second_column = TableCustomField.generate!(name: 'Count', field_format: 'int')
       @third_column = create_colored_custom_field
       @third_column_values = @third_column.enumerations.pluck(:id)
-      table = Table.create(name: 'Equipment', description: 'IT equipment list')
-      table.columns << [@first_column, @second_column, @third_column]
-      @calculation = Calculation.create(name: 'Number of devices',
-                                        description: 'Sum up the devices of a list',
-                                        formula: 'sum',
-                                        columns: true,
-                                        rows: false,
-                                        inheritable: true,
-                                        table_id: table.id)
-      @calculation.fields << @second_column
-      @calculation.fields << @third_column
-      table.calculations << @calculation # sets explicitly the has_many side
+      table_config = TableConfig.create(name: 'Equipment', description: 'IT equipment list')
+      table_config.columns << [@first_column, @second_column, @third_column]
+      @calculation_config = CalculationConfig.create(name: 'Number of devices',
+                                                     description: 'Sum up the devices of a list',
+                                                     formula: 'sum',
+                                                     inheritable: true,
+                                                     table_config_id: table_config.id)
+      @calculation_config.columns << @second_column
+      @calculation_config.columns << @third_column
+      table_config.calculation_configs << @calculation_config # sets explicitly the has_many side
 
       # Define spreadsheet
       [@guest_project, @host_project].each do |project|
@@ -66,7 +64,7 @@ module RedmineTableCalculationInheritance
                                           description: "Required Equipment for #{project.name}",
                                           project_id: project.id,
                                           author_id: @user.id,
-                                          table_id: table.id)
+                                          table_config_id: table_config.id)
         first_row = SpreadsheetRow.create(spreadsheet_id: @spreadsheet.id, position: 1)
         first_row.custom_field_values = { @first_column.id => 'Laptop',
                                           @second_column.id => 12,
@@ -90,7 +88,7 @@ module RedmineTableCalculationInheritance
     def add_spreadsheet_row_result(project)
       result = SpreadsheetRowResult.create(author_id: @user.id,
                                            spreadsheet_id: project.spreadsheets.take.id,
-                                           calculation_id: @calculation.id,
+                                           calculation_config_id: @calculation_config.id,
                                            comment: '-')
       result.custom_field_values = { @second_column.id => 17,
                                      @third_column.id => @third_column_values.second }
@@ -114,7 +112,7 @@ module RedmineTableCalculationInheritance
 
     def spreadsheet_row_result_ids(project)
       { spreadsheet_id: project.spreadsheets.take.id,
-        calculation_id: @calculation.id,
+        calculation_config_id: @calculation_config.id,
         project_id: project.id }
     end
 

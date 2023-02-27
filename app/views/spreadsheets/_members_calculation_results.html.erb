@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<% if table.calculations.present? %>
+<% if table.calculation_configs.present? %>
   <%= tag.p do %>
     <%= content_tag :table, class: 'list' do %>
       <%= content_tag :thead do %>
@@ -35,7 +35,7 @@
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
-        <% table.calculations.each do |calc| %> 
+        <% table.calculation_configs.each do |calc| %> 
           <%= content_tag :tr do %>
             <%= content_tag(:td, calc.name, class: 'name') %>
             <% @current_row = table.result_row(calc.formula, calc) %>
@@ -47,17 +47,17 @@
                 <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) %>
                   <% @row_id = @current_row.map(&:row_id).compact.uniq.join %>
                   <%= link_to l(:button_edit),
-                              (@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_id: calc)), 
+                              (@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_config_id: calc)), 
                               :class => 'icon icon-edit' %>
                 <% end %>
               <% end %>
             <% elsif table.is_a?(MembersResultTable) %>
-              <% @row_id = SpreadsheetRowResult.find_by(calculation_id: calc.id,spreadsheet_id: @spreadsheet.id) %>
+              <% @row_id = SpreadsheetRowResult.find_by(calculation_config_id: calc.id,spreadsheet_id: @spreadsheet.id) %>
               <%= tag.td class: 'buttons' do %>
                 <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) && @row_id.present? %>  
                   <% cfv = custom_field_values_of(@current_row) %>
                   <%= link_to l(:label_inherit),
-                              spreadsheet_row_result_path(@row_id, calculation_id: calc.id, cfv: cfv), 
+                              spreadsheet_row_result_path(@row_id, calculation_config_id: calc.id, cfv: cfv), 
                               method: @row_id.present? ? :patch : :get,
                               class: 'icon icon-checked',
                               title: l(:label_inherit) %>

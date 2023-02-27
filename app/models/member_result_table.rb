@@ -31,7 +31,7 @@ class MemberResultTable < SpreadsheetResultTable
   # Rows are collected over member spreadsheets. Hence,
   # all calculations will be based on these rows.
   #
-  def rows(_calculation_id = nil)
+  def rows(_calculation_config_id = nil)
     collection = []
     collection << member_rows
     collection.flatten.compact

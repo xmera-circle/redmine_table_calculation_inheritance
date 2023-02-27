@@ -45,7 +45,7 @@ module TableCaclulationInheritance
       assert_response :success
       assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{spreadsheet.name}"
       assert_select '#content fieldset legend strong', 3
-      assert_select 'tbody tr td.name', { text: @calculation.name, count: 4 }
+      assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 4 }
       assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 0 }
       assert_select 'tbody tr td:nth-of-type(2)', { text: /17/, count: 3 }
       assert_select 'fieldset.collapsible' do
@@ -60,7 +60,7 @@ module TableCaclulationInheritance
       assert_response :success
       assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{spreadsheet.name}"
       assert_select '#content fieldset legend strong', 3
-      assert_select 'tbody tr td.name', { text: @calculation.name, count: 4 }
+      assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 4 }
       assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 2 }
       assert_select 'fieldset.collapsible' do
         assert_select 'tbody tr td:nth-of-type(2)', { text: /17/, count: 2 }
@@ -119,7 +119,7 @@ module TableCaclulationInheritance
       assert_response :success
       assert_select '.spreadsheet.box h3'
       assert_select 'table.list' do
-        assert_select 'tbody tr td.name', { text: @calculation.name, count: 1 }
+        assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 1 }
         assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 1 }
       end
       assert_select '.icon-zoom-in', 2

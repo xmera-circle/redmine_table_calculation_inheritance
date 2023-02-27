@@ -22,7 +22,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   include Redmine::SafeAttributes
   acts_as_customizable
 
-  belongs_to :calculation
+  belongs_to :calculation_config
   belongs_to :spreadsheet
   belongs_to :author, class_name: 'User'
 
@@ -33,7 +33,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   safe_attributes(
     :author_id,
     :spreadsheet_id,
-    :calculation_id,
+    :calculation_config_id,
     :custom_fields,
     :custom_field_values,
     :comment
@@ -56,7 +56,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   # TODO: delegate to table
   #
   def column_ids
-    spreadsheet&.table&.column_ids
+    spreadsheet&.table_config&.column_ids
   end
 
   def destroy_adapted_row_values
