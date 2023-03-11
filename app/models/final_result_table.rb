@@ -32,11 +32,11 @@ class FinalResultTable < MembersResultTable
     @comment_field_name = Struct.new(:name)
   end
 
-  def result_table_row(operation, column, calculation)
-    calc_result = result(calculation.id, column)
+  def result_table_row(operation, column, calculation_config)
+    calc_result = result(calculation_config.id, column)
     return calc_result if calc_result.row
 
-    result_value(operation, column, calculation)
+    result_value(operation, column, calculation_config)
   end
 
   def columns
@@ -50,9 +50,9 @@ class FinalResultTable < MembersResultTable
 
   attr_writer :row
 
-  def extend_result_row(results, calculation)
-    extended = super(results, calculation)
-    extended.append(comment_value(calculation))
+  def extend_result_row(results, calculation_config)
+    extended = super(results, calculation_config)
+    extended.append(comment_value(calculation_config))
     extended
   end
 
@@ -60,19 +60,19 @@ class FinalResultTable < MembersResultTable
     comment_field_name.new(l(:field_comment))
   end
 
-  def comment_value(_calculation)
+  def comment_value(_calculation_config)
     RowValue.new(value: row&.comment, row: row)
   end
 
-  def result(calculation_id, column)
-    @row = spreadsheet_result_row(calculation_id)
+  def result(calculation_config_id, column)
+    @row = spreadsheet_result_row(calculation_config_id)
     RowValue.new(value: row&.custom_value_for(column.id)&.value,
                  row: row,
                  col: column)
   end
 
-  def spreadsheet_result_row(calculation_id)
-    SpreadsheetRowResult.find_by(calculation_id: calculation_id,
+  def spreadsheet_result_row(calculation_config_id)
+    SpreadsheetRowResult.find_by(calculation_config_id: calculation_config_id,
                                  spreadsheet_id: spreadsheet.id)
   end
 end

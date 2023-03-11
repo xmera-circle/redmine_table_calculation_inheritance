@@ -37,11 +37,11 @@ module TableCaclulationInheritance
 
     test 'should render new for admin' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
 
       log_user('admin', 'admin')
       get new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: spreadsheet.id,
-                                                              calculation_id: calc.id,
+                                                              calculation_config_id: calc.id,
                                                               project_id: @host_project.id)
       assert :success
 
@@ -53,12 +53,12 @@ module TableCaclulationInheritance
 
     test 'should render new when allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
       @manager_role.add_permission!(:edit_spreadsheet_results)
 
       log_user('jsmith', 'jsmith')
       get new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: spreadsheet.id,
-                                                              calculation_id: calc.id,
+                                                              calculation_config_id: calc.id,
                                                               project_id: @host_project.id)
       assert :success
 
@@ -70,11 +70,11 @@ module TableCaclulationInheritance
 
     test 'should not render new when allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
 
       log_user('jsmith', 'jsmith')
       get new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: spreadsheet.id,
-                                                              calculation_id: calc.id,
+                                                              calculation_config_id: calc.id,
                                                               project_id: @host_project.id)
       assert 403
 
@@ -83,13 +83,13 @@ module TableCaclulationInheritance
 
     test 'should create if allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
       @manager_role.add_permission!(:edit_spreadsheet_results)
 
       log_user('jsmith', 'jsmith')
       assert_difference 'SpreadsheetRowResult.count' do
         post project_spreadsheet_spreadsheet_row_results_path(spreadsheet_id: spreadsheet.id,
-                                                              calculation_id: calc.id,
+                                                              calculation_config_id: calc.id,
                                                               project_id: @host_project.id),
              params: {
                spreadsheet_row_result: {
@@ -105,13 +105,13 @@ module TableCaclulationInheritance
 
     test 'should not create if not allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
       @manager_role.add_permission!(:edit_spreadsheet_results)
 
       log_user('jsmith', 'jsmith')
       assert_difference 'SpreadsheetRowResult.count' do
         post project_spreadsheet_spreadsheet_row_results_path(spreadsheet_id: spreadsheet.id,
-                                                              calculation_id: calc.id,
+                                                              calculation_config_id: calc.id,
                                                               project_id: @host_project.id),
              params: {
                spreadsheet_row_result: {
@@ -127,11 +127,11 @@ module TableCaclulationInheritance
 
     test 'should update if allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
       SpreadsheetRowResult.create(custom_field_values: { @second_column.id => '34' },
                                   author_id: User.current.id,
                                   spreadsheet_id: spreadsheet.id,
-                                  calculation_id: calc.id,
+                                  calculation_config_id: calc.id,
                                   comment: '-')
       row_result = spreadsheet.result_rows.take
       @manager_role.add_permission!(:edit_spreadsheet_results)
@@ -154,11 +154,11 @@ module TableCaclulationInheritance
 
     test 'should not update if not allowed to' do
       spreadsheet = @host_project.spreadsheets.take
-      calc = spreadsheet.table.calculations.take
+      calc = spreadsheet.table_config.calculation_configs.take
       SpreadsheetRowResult.create(custom_field_values: { @second_column.id => '34' },
                                   author_id: User.current.id,
                                   spreadsheet_id: spreadsheet.id,
-                                  calculation_id: calc.id,
+                                  calculation_config_id: calc.id,
                                   comment: '-')
       row_result = spreadsheet.result_rows.take
 

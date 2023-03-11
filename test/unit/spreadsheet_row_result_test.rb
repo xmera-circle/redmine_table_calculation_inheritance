@@ -29,10 +29,10 @@ module TableCaclulation
     fixtures :projects, :users
 
     def setup
-      @table = Table.generate!
+      @table_config = TableConfig.generate!
       @spreadsheet = Spreadsheet.generate!(project_id: Project.find(1).id,
                                            author_id: User.find(2).id,
-                                           table_id: @table.id)
+                                           table_config_id: @table_config.id)
     end
 
     test 'should have many custom values' do
@@ -47,7 +47,7 @@ module TableCaclulation
 
     test 'should find TableCustomField instances' do
       cf = custom_field
-      @table.columns << cf
+      @table_config.columns << cf
       row = SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id)
       assert row.available_custom_fields.count == 1
     end

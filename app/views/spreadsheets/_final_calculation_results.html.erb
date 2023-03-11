@@ -20,12 +20,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<% if table.calculations.present? %>
+<% if table.calculation_configs.present? %>
   <%= tag.p do %>
     <%= content_tag :table, class: 'list' do %>
       <%= content_tag :thead do %>
         <%= content_tag :tr do %>
-          <%= content_tag(:th, l(:label_calculation), class: 'name') %>
+          <%= content_tag(:th, l(:label_calculation_config), class: 'name') %>
           <% table.columns.each do |column| %>
             <%= content_tag(:th, column.name, class: 'name') %>
           <% end %>
@@ -33,7 +33,7 @@
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
-        <% table.calculations.each do |calc| %> 
+        <% table.calculation_configs.each do |calc| %> 
           <%= content_tag :tr do %>
             <%= content_tag(:td, calc.name, class: 'name') %>
             <% @current_row = table.result_row(calc.formula, calc) %>
@@ -44,7 +44,7 @@
               <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) %>
                 <% @row_id = @current_row.map(&:row_id).compact.uniq.join %>    
                 <% cfv = custom_field_values_of(@current_row) %>
-                <%= link_to l(:button_edit),(@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_id: calc, cfv: cfv)), :class => 'icon icon-edit' %>
+                <%= link_to l(:button_edit),(@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_config_id: calc, cfv: cfv)), :class => 'icon icon-edit' %>
               <% end %>
             <% end %>
           <% end %>

@@ -46,15 +46,15 @@ module TableCaclulationInheritance
 
       assert_select '.spreadsheet.box h3'
       assert_select 'table.list' do
-        assert_select 'tbody tr td.name', { text: @calculation.name, count: 1 }
+        assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 1 }
         assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 1 }
       end
       assert_select '.icon-document', 1
     end
 
     test 'should not display spreadsheet card on projects overview page if not allowed to' do
-      @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @user.allowed_to?(:view_spreadsheet_results, @host_project)
+      @manager_role.remove_permission!(:view_spreadsheet)
+      assert_not @user.allowed_to?(:view_spreadsheet, @host_project)
 
       log_user('jsmith', 'jsmith')
       get project_path(@host_project.id)

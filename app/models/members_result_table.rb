@@ -32,7 +32,7 @@ class MembersResultTable < SpreadsheetResultTable
   # Rows are collected over guest spreadsheets. Hence,
   # all calculations will be based on these rows.
   #
-  def rows(_calculation_id = nil)
+  def rows(_calculation_config_id = nil)
     collection = project_spreadsheet_rows
     guests.each do |guest|
       collection << guest_rows(guest)

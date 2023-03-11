@@ -20,7 +20,7 @@
 
 module RedmineTableCalculationInheritance
   module TestObjectCreators
-    def Table.generate!(attributes = {})
+    def TableConfig.generate!(attributes = {})
       @generated_table_name ||= +'Table 0'
       @generated_table_name.succ!
       table = new(attributes)

@@ -26,7 +26,7 @@ class SpreadsheetRowResultsController < ApplicationController
   before_action :find_project_by_project_id, only: %i[new create]
   before_action :find_spreadsheet
   before_action :find_project_of_spreadsheet
-  before_action :find_calculation, except: %i[edit]
+  before_action :find_calculation_config, except: %i[edit]
   before_action :authorize
 
   helper :custom_fields
@@ -85,14 +85,14 @@ class SpreadsheetRowResultsController < ApplicationController
 
   def new_row
     SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id,
-                             calculation_id: @calculation.id,
+                             calculation_config_id: @calculation_config.id,
                              author_id: User.current.id,
                              comment: '')
   end
 
-  def find_calculation
-    calculation_id = params[:calculation_id] || params[:spreadsheet_row_result][:calculation_id]
-    @calculation = Calculation.find_by(id: calculation_id.to_i)
+  def find_calculation_config
+    calculation_config_id = params[:calculation_config_id] || params[:spreadsheet_row_result][:calculation_config_id]
+    @calculation_config = CalculationConfig.find_by(id: calculation_config_id.to_i)
   end
 
   def find_spreadsheet
