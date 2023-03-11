@@ -53,8 +53,8 @@ module TableCaclulationInheritance
     end
 
     test 'should not display spreadsheet card on projects overview page if not allowed to' do
-      @manager_role.remove_permission!(:view_spreadsheet_results)
-      assert_not @user.allowed_to?(:view_spreadsheet_results, @host_project)
+      @manager_role.remove_permission!(:view_spreadsheet)
+      assert_not @user.allowed_to?(:view_spreadsheet, @host_project)
 
       log_user('jsmith', 'jsmith')
       get project_path(@host_project.id)

@@ -33,7 +33,6 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
   requires_redmine_plugin :redmine_project_types_relations, version_or_higher: '2.0.0'
 
   project_module :table_calculation do
-    permission :view_spreadsheet_results, { spreadsheets: %i[results index] }
     permission :edit_spreadsheet_results, { spreadsheet_row_results: %i[new create edit update] }
   end
 end

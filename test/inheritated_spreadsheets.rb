@@ -28,10 +28,10 @@ module RedmineTableCalculationInheritance
     def setup_inheritated_spreadsheets
       @user = User.find(2)
       @manager_role = Role.find_by_name('Manager')
-      @manager_role.add_permission!(:view_spreadsheet_results)
+      @manager_role.add_permission!(:view_spreadsheet)
       @developer_role = Role.find_by_name('Developer')
       @developer_role.add_permission!(:edit_spreadsheet_results)
-      @developer_role.add_permission!(:view_spreadsheet_results)
+      @developer_role.add_permission!(:view_spreadsheet)
 
       # Define relations
       superordinated_project_type = find_project_type(id: 4)
@@ -96,7 +96,7 @@ module RedmineTableCalculationInheritance
     end
 
     def check_guest_project_permissions
-      assert @user.allowed_to?(:view_spreadsheet_results, @guest_project)
+      assert @user.allowed_to?(:view_spreadsheet, @guest_project)
       assert @user.allowed_to?(:edit_spreadsheet_results, @guest_project)
     end
 

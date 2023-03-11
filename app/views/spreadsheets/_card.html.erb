@@ -20,13 +20,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<% if @project.module_enabled?(:table_calculation) && User.current.allowed_to?(:view_spreadsheet_results, @project) %>
+<% if @project.module_enabled?(:table_calculation) && User.current.allowed_to?(:view_spreadsheet, @project) %>
   <%= tag.div class: 'spreadsheet box' do %>
     <%= tag.div class: 'contextual' do %>
       <%= actions_dropdown do %>
         <%= link_to l(:label_calculation_details),
             results_project_spreadsheet_path(@project, id: spreadsheet),
-            class: 'icon icon-zoom-in' if User.current.allowed_to?(:view_spreadsheet_results, @project) && calculations_of(spreadsheet).present? %>
+            class: 'icon icon-zoom-in' if calculations_of(spreadsheet).present? %>
         <%= link_to l(:label_spreadsheet_configuration), 
             edit_project_spreadsheet_path(@project, spreadsheet),
             class: 'icon icon-settings' if User.current.allowed_to?(:configure_spreadsheet, @project)%>
@@ -40,14 +40,12 @@
         <%= link_to l(:label_calculation_details),
               results_project_spreadsheet_path(@project, id: spreadsheet),
               class: 'icon-only icon-zoom-in',
-              title: l(:label_calculation_details) if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
+              title: l(:label_calculation_details) %>
       <% end %>
     <% end %>
 
     <%= tag.p textilizable spreadsheet.description %>
-    <% if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
       <%= render_card_table(guests, project, spreadsheet) if calculations_of(spreadsheet).present? %>
-    <% end %>
     <%= tag.small do %>
       <%= authoring spreadsheet.created_on, spreadsheet.author %>.
       <% if spreadsheet.created_on != spreadsheet.updated_on %>
