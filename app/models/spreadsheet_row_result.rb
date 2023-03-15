@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class SpreadsheetRowResult < ActiveRecord::Base
+  include Redmine::I18n
   include Redmine::SafeAttributes
   acts_as_customizable
 
@@ -26,6 +27,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   belongs_to :spreadsheet
   belongs_to :author, class_name: 'User'
 
+  after_validation :update_status
   after_destroy :destroy_adapted_row_values
 
   validates :comment, presence: true
@@ -39,6 +41,16 @@ class SpreadsheetRowResult < ActiveRecord::Base
     :comment
   )
 
+  STATUS = { label_row_result_status_new: 1,
+             label_row_result_status_unchanged: 2,
+             label_row_result_status_changed: 3 }.freeze
+
+  # Translates the database value for status via the mapped
+  # label in an understandable value for the user.
+  def status
+    l(STATUS.key(read_attribute(:status)))
+  end
+
   ##
   # Is required by ApplicationHelpers#format_object.
   #
@@ -51,6 +63,12 @@ class SpreadsheetRowResult < ActiveRecord::Base
   end
 
   private
+
+  def update_status
+    return if new_record?
+
+    self.status = custom_field_values_changed? ? 3 : 2
+  end
 
   ##
   # TODO: delegate to table

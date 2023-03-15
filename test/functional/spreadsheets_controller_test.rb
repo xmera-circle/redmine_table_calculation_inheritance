@@ -36,7 +36,7 @@ module TableCaclulationInheritance
     end
 
     test 'should show aggregated results' do
-      assert @user.allowed_to?(:view_spreadsheet, @host_project)
+      assert @jsmith.allowed_to?(:view_spreadsheet, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -68,8 +68,8 @@ module TableCaclulationInheritance
     end
 
     test 'should response 403 if not allowed to view aggregated results' do
-      @manager_role.remove_permission!(:view_spreadsheet)
-      assert_not @user.allowed_to?(:view_spreadsheet, @host_project)
+      @manager.remove_permission!(:view_spreadsheet)
+      assert_not @jsmith.allowed_to?(:view_spreadsheet, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -79,9 +79,9 @@ module TableCaclulationInheritance
     end
 
     test 'should show link to edit aggregated results' do
-      @manager_role.add_permission!(:edit_spreadsheet_results)
-      assert @user.allowed_to?(:view_spreadsheet, @host_project)
-      assert @user.allowed_to?(:edit_spreadsheet_results, @host_project)
+      @manager.add_permission!(:edit_spreadsheet_results)
+      assert @jsmith.allowed_to?(:view_spreadsheet, @host_project)
+      assert @jsmith.allowed_to?(:edit_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -92,8 +92,8 @@ module TableCaclulationInheritance
     end
 
     test 'should show no link to edit aggregated results if not allowed to' do
-      assert @user.allowed_to?(:view_spreadsheet, @host_project)
-      assert_not @user.allowed_to?(:edit_spreadsheet_results, @host_project)
+      assert @jsmith.allowed_to?(:view_spreadsheet, @host_project)
+      assert_not @jsmith.allowed_to?(:edit_spreadsheet_results, @host_project)
       spreadsheet = @host_project.spreadsheets.take
       assert @host_project.guests.present?
 
@@ -105,9 +105,9 @@ module TableCaclulationInheritance
     end
 
     test 'should show aggregated result in the card on spreadsheets main page' do
-      @manager_role.add_permission!(:edit_spreadsheet_results)
-      assert @user.allowed_to?(:view_spreadsheet, @host_project)
-      assert @user.allowed_to?(:edit_spreadsheet_results, @host_project)
+      @manager.add_permission!(:edit_spreadsheet_results)
+      assert @jsmith.allowed_to?(:view_spreadsheet, @host_project)
+      assert @jsmith.allowed_to?(:edit_spreadsheet_results, @host_project)
       assert @host_project.guests.present?
 
       log_user('jsmith', 'jsmith')
@@ -126,8 +126,8 @@ module TableCaclulationInheritance
     end
 
     test 'should not show results in card on spreadsheets main page if not allowed to' do
-      @manager_role.remove_permission!(:view_spreadsheet)
-      assert_not @user.allowed_to?(:view_spreadsheet, @host_project)
+      @manager.remove_permission!(:view_spreadsheet)
+      assert_not @jsmith.allowed_to?(:view_spreadsheet, @host_project)
       assert @host_project.guests.present?
 
       log_user('jsmith', 'jsmith')

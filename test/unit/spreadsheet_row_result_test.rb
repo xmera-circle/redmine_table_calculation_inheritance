@@ -20,12 +20,8 @@
 
 require File.expand_path('../test_helper', __dir__)
 
-module TableCaclulation
-  class SpreadsheetRowResultTest < ActiveSupport::TestCase
-    extend RedmineTableCalculationInheritance::LoadFixtures
-    include RedmineTableCalculationInheritance::ProjectTypeCreator
-    include RedmineTableCalculationInheritance::TestObjectCreators
-
+module RedmineTableCalculationInheritance
+  class SpreadsheetRowResultTest < UnitTestCase
     fixtures :projects, :users
 
     def setup
@@ -50,6 +46,34 @@ module TableCaclulation
       @table_config.columns << cf
       row = SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id)
       assert row.available_custom_fields.count == 1
+    end
+
+    test 'should have default status' do
+      cf = custom_field
+      @table_config.columns << cf
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
+                                        comment: 'First result')
+      assert_equal 'New', row.status
+    end
+
+    test 'should update status to changed when custom field value has changed' do
+      cf = custom_field
+      @table_config.columns << cf
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
+                                        comment: 'First result')
+      row.custom_field_values = { cf.id => 'A' }
+      row.save!
+      assert_equal 'Changed', row.status
+    end
+
+    test 'should update status to unchanged when custom field value stayed the same' do
+      cf = custom_field
+      @table_config.columns << cf
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
+                                        comment: 'First result')
+      row.comment = 'Update comment'
+      row.save!
+      assert_equal 'Unchanged', row.status
     end
 
     private

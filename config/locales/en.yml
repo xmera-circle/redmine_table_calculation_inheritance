@@ -6,6 +6,12 @@ en:
   label_adjusted_result_plural: Final Results
   label_aggregated_result_plural: Calculated Results
   label_single_calculation_results: Single Calculation Results
+  label_row_result_comment: Rational
+  label_row_result_status: Status
+  label_row_result_last_editing: Last Editing
+  label_row_result_status_new: New
+  label_row_result_status_unchanged: Unchanged
+  label_row_result_status_changed: Changed
 
   permission_view_spreadsheet_results: View calcualation results
   permission_edit_spreadsheet_results: Edit calculation results 
