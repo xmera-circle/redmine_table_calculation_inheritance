@@ -33,7 +33,7 @@ require File.expand_path('../../../plugins/redmine_table_calculation/test/test_o
 require File.expand_path('../../../plugins/redmine_table_calculation/test/prepare_spreadsheet', __dir__)
 require File.expand_path('../../../plugins/redmine_table_calculation/test/prepare_data_table', __dir__)
 # Load Redmine Table Calculation Inheritance plugin test helper
-require_relative 'inheritated_spreadsheets'
+require_relative 'prepare_spreadsheet_row_results'
 require_relative 'project_type_creator'
 
 # The gem minitest-reporters gives color to the command-line
@@ -52,6 +52,6 @@ module RedmineTableCalculationInheritance
     include RedmineTableCalculation::Enumerations
     include RedmineTableCalculation::PrepareDataTable
     include RedmineTableCalculation::PrepareSpreadsheet
-    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
+    include RedmineTableCalculationInheritance::PrepareSpreadsheetRowResults
   end
 end

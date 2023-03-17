@@ -21,6 +21,7 @@
 class FrozenResultTableHeader
   include RedmineTableCalculation::CalculationUtils
   include Redmine::I18n
+  include Enumerable
 
   attr_reader :default_columns, :table_config
 
@@ -53,6 +54,11 @@ class FrozenResultTableHeader
     default_columns.each_with_index.map do |column, index|
       SpareTableCell.new(position: offset + index, column_index: offset + index, name: column)
     end
+  end
+
+  # Allows to iterate through FrozenResultTableCell or SpareTableCell instances
+  def each(&block)
+    columns.each(&block)
   end
 
   private

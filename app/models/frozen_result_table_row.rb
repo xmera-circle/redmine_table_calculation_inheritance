@@ -22,6 +22,8 @@ class FrozenResultTableRow
   include Enumerable
   attr_reader :result_header, :row, :calculation_config
 
+  delegate :id, :spreadsheet, :author, :visible?, to: :row, allow_nil: true
+
   # @param result_header [FrozenResultTableHeader#result_header] ResultTableHeader columns.
   # @param row [SpreadsheetRowResult] The SpreadsheetRowResult object.
   # @param calculation_config [CalculationConfig] The rows calculation config object (optional).

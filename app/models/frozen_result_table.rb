@@ -34,17 +34,22 @@ class FrozenResultTable
   # The header of a frozen result table having empty columns where no result is
   # required and a first column header for the calculation name.
   def header
-    header_object.columns
+    frozen_result_table_header.columns
   end
 
   # Result rows, one for each calculation.
   def rows
     calculation_configs.map do |config|
       row = spreadsheet_result_row_by(calculation_config_id: config.id)
-      FrozenResultTableRow.new(result_header: header_object.result_header,
+      FrozenResultTableRow.new(result_header: frozen_result_table_header.result_header,
                                calculation_config: config,
                                row: row)
     end
+  end
+
+  def frozen_result_table_header
+    FrozenResultTableHeader.new(default_columns: default_columns,
+                                table_config: table_config)
   end
 
   private
@@ -53,11 +58,6 @@ class FrozenResultTable
   def spreadsheet_result_row_by(**attrs)
     row = spreadsheet_result_rows.find_by(calculation_config_id: attrs[:calculation_config_id])
     row.presence
-  end
-
-  def header_object
-    FrozenResultTableHeader.new(default_columns: default_columns,
-                                table_config: table_config)
   end
 
   def default_columns

@@ -39,6 +39,27 @@ module RedmineTableCalculationInheritance
   # @note The second calculation result does not exist
   #
   module InheritatedSpreadsheets
+    # Tables and calculations based on RedmineTableCalculation::PrepareDataTable
+    def setup_aggregated_result_table
+      define_roles_and_permissions
+      define_project_relations
+      define_table_config
+      define_calculation_config
+      @projects = @host_project.guests.prepend(@host_project)
+      @projects.each do |project|
+        generate_spreadsheet(project: project)
+      end
+      add_spreadsheet_row_result(project: @host_project,
+                                 values: { @amount_field.id => 18 },
+                                 calculation_config: @sum_config)
+      add_spreadsheet_row_result(project: @host_project,
+                                 values: { @quality_field.id => @enumeration_values.last },
+                                 calculation_config: @max_config)
+      # min calculation results are not yet frozen
+      AggregatedResultTable.new(projects: @projects,
+                                spreadsheet: @host_project.spreadsheets.first)
+    end
+
     def setup_frozen_result_table
       setup_default_data_table
       @frozen_result_table = FrozenResultTable.new(spreadsheet: @spreadsheet)
@@ -68,15 +89,10 @@ module RedmineTableCalculationInheritance
       @guest_project.hosts << @host_project
       @host_project.enable_module!(:table_calculation)
       @guest_project.enable_module!(:table_calculation)
+      assert_equal 1, @host_project.guests.count
+      assert_equal 1, @guest_project.hosts.count
     end
-
-    def project_with_type(id:, type:)
-      project = Project.find(id)
-      project.project_type_id = type
-      project.save
-      project
-    end
-
+  
     def define_table_and_calculation_config
       @name_column = TableCustomField.generate!(name: 'Name', field_format: 'string')
       @count_column = TableCustomField.generate!(name: 'Count', field_format: 'int')
@@ -103,6 +119,7 @@ module RedmineTableCalculationInheritance
     end
 
     def generate_inheritated_spreadsheets
+      spreadsheets = []
       [@guest_project, @host_project].each do |project|
         equipment_spreadsheet = Spreadsheet.create(name: 'Equipment list',
                                           description: "Required Equipment for #{project.name}",
@@ -119,15 +136,21 @@ module RedmineTableCalculationInheritance
                                            @count_column.id => 5,
                                            @condition_column.id => @condition_column_values.last }
         second_row.save
+        spreadsheets << equipment_spreadsheet
       end
+      @spreadsheets = spreadsheets
     end
 
-    def add_spreadsheet_row_result(project)
+    # @param operation [String|Symbol] Is either :sum or :max.
+    def add_spreadsheet_row_result(**attrs)
+      project = attrs[:project]
+      values = attrs[:values] || { @count_column.id => 17 }
+      calculation_config = attrs[:calculation_config]
       result = SpreadsheetRowResult.new(author_id: @jsmith.id,
                                         spreadsheet_id: project.spreadsheets.take.id,
-                                        calculation_config_id: @sum_calculation_config.id,
+                                        calculation_config_id: calculation_config.id,
                                         comment: '-')
-      result.custom_field_values = { @count_column.id => 17 }
+      result.custom_field_values = values
       result.save!
     end
 

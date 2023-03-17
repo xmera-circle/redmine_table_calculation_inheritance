@@ -34,6 +34,16 @@ module RedmineTableCalculationInheritance
       @default_header = @frozen_result_table_header.default_header(@result_header.size)
     end
 
+    test 'should respond to :id, :spreadsheet, :author, :visible?' do
+      frozen_result_table_row = FrozenResultTableRow.new(result_header: @result_header,
+                                                         row: @spreadsheet.result_rows.first,
+                                                         calculation_config: @max_config)
+      assert frozen_result_table_row.respond_to?(:id), 'Does not respond to :id'
+      assert frozen_result_table_row.respond_to?(:spreadsheet), 'Does not respond to :spreadsheet'
+      assert frozen_result_table_row.respond_to?(:author), 'Does not respond to :author'
+      assert frozen_result_table_row.respond_to?(:visible?), 'Does not respond to :visible?'
+    end
+
     test 'should have empty cells when no frozen result exists' do
       frozen_result_table_row = FrozenResultTableRow.new(result_header: @result_header,
                                                          row: @spreadsheet.result_rows.first,

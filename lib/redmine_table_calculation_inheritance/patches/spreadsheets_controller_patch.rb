@@ -42,6 +42,7 @@ module RedmineTableCalculationInheritance
 
         ##
         # Refers to the instance variables in SpreadsheetsController#index
+        # but renders results.html.erb
         #
         def results
           index

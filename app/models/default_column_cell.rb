@@ -1,7 +1,6 @@
-<%
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation Inheritance.
+# This file is part of the Plugin Redmine Table Calculation.
 #
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
@@ -18,10 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-%>
 
-<%= render partial: 'inherited_calculation', locals: { project: @project,
-                                                       spreadsheet: @spreadsheet,
-                                                       members: @members } %>
-
-<%= render partial: 'sidebar' %>
+class DefaultColumnCell < SpareTableCell
+  def column_id
+    nil
+  end
+end

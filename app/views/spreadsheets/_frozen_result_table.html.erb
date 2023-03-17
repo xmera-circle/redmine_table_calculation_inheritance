@@ -25,26 +25,22 @@
     <%= content_tag :table, class: 'list' do %>
       <%= content_tag :thead do %>
         <%= content_tag :tr do %>
-          <%= content_tag(:th, l(:label_calculation_config), class: 'name') %>
-          <% table.columns.each do |column| %>
-            <%= content_tag(:th, column.name, class: 'name') %>
+          <% table.header.each do |column| %>
+            <%= content_tag(:th, column.name, class: 'name', title: column.description) %>
           <% end %>
             <%= content_tag(:th, '') %>
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
-        <% table.calculation_configs.each do |calc| %> 
+        <% table.rows.each do |row| %> 
           <%= content_tag :tr do %>
-            <%= content_tag(:td, calc.name, class: 'name') %>
-            <% @current_row = table.result_row(calc.formula, calc) %>
-            <% @current_row.each do |result| %>
-              <%= content_tag(:td, value(result.value, result.col), class: 'name', data: { color: color(result.value, result.col) }) %>
+            <% row.each do |cell| %>
+              <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }) %>
             <% end %>
             <%= tag.td class: 'buttons' do %>
-              <% if User.current.allowed_to?(:edit_spreadsheet_results, @project) %>
-                <% @row_id = @current_row.map(&:row_id).compact.uniq.join %>    
-                <% cfv = custom_field_values_of(@current_row) %>
-                <%= link_to l(:button_edit),(@row_id.present? ? edit_spreadsheet_row_result_path(@row_id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet, calculation_config_id: calc, cfv: cfv)), :class => 'icon icon-edit' %>
+              <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
+                <% cfv = custom_field_values_of(row.id) %>
+                <%= link_to l(:button_edit),(row.id.present? ? edit_spreadsheet_row_result_path(row.id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: table.spreadsheet, calculation_config_id: row.calculation_config.id, cfv: cfv)), :class => 'icon icon-edit' %>
               <% end %>
             <% end %>
           <% end %>

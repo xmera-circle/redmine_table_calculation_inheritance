@@ -19,19 +19,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 module InheritanceSpreadsheetsHelper
-  def render_final_result_table(guests, project, spreadsheet)
-    render partial: 'final_calculation_results',
-           locals: { table: FinalResultTable.new(guests, project, spreadsheet) }
+  def render_frozen_result_table(project, spreadsheet)
+    render partial: 'frozen_result_table',
+           locals: { table: FrozenResultTable.new(spreadsheet: spreadsheet),
+                     project: project }
   end
 
-  def render_members_result_table(guests, project, spreadsheet)
-    render partial: 'members_calculation_results',
-           locals: { table: MembersResultTable.new(guests, project, spreadsheet) }
+  def render_guests_frozen_result_tables(guests)
+    render partial: 'guests_frozen_result_tables',
+           locals: { guests: guests }
   end
 
-  def render_member_result_table(member, spreadsheet)
-    render partial: 'member_calculation_results',
-           locals: { table: MemberResultTable.new(member, spreadsheet) }
+  def render_inheritated_result_table(members, spreadsheet)
+    render partial: 'inheritated_result',
+           locals: { table: AggregatedResultTable.new(projects: members, spreadsheet: spreadsheet) }
   end
 
   def render_card_table(guests, project, spreadsheet)
@@ -48,7 +49,10 @@ module InheritanceSpreadsheetsHelper
     table_config.calculation_configs
   end
 
+  # TODO: Check if this could be solved differently
   def custom_field_values_of(current_row)
+    return unless current_row
+
     group = current_row.group_by(&:col_id)
     cfv = group.each_with_object({}) do |(k, v), hash|
       hash[k] = v.first ? v.first.value : ''

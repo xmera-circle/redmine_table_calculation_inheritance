@@ -24,6 +24,13 @@ module RedmineTableCalculationInheritance
   # project_type table
   #
   module ProjectTypeCreator
+    def project_with_type(id:, type:)
+      project = Project.find(id)
+      project.project_type_id = type
+      project.save
+      project
+    end
+
     def find_project_type(id:)
       project_type = ProjectType.find(id)
       project_type.is_project_type = true
