@@ -1,0 +1,29 @@
+<% if table.calculation_configs.present? %>
+  <%= tag.p do %>
+    <%= content_tag :table, class: 'list' do %>
+      <%= content_tag :thead do %>
+        <%= content_tag :tr do %>
+          <% table.header.each do |column| %>
+            <%= content_tag(:th, column.name, class: 'name', title: column.description) %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= content_tag :tbody do %>
+        <% table.projects.each do |project| %>
+          <%= tag.tr class: 'group' do %>
+            <%= tag.td class: 'name', colspan: table.column_count do %>
+              <%="#{project.project_type.name} » "%><%= link_to(project.name, project_spreadsheet_path(project, table.spreadsheet_of(project)) )%>
+            <% end %>
+          <% end %>
+          <% table.rows_of(project).each do |row| %> 
+            <%= content_tag :tr do %>
+              <% row.each do |cell| %>
+                <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }) %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

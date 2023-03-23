@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class FrozenResultTable
+  include RedmineTableCalculationInheritance::DefaultColumns
   include RedmineTableCalculation::CalculationUtils
   include Redmine::I18n
 
@@ -27,7 +28,7 @@ class FrozenResultTable
   def initialize(**attrs)
     @spreadsheet = attrs[:spreadsheet]
     @table_config = spreadsheet.table_config
-    @spreadsheet_result_rows = spreadsheet.result_rows
+    @spreadsheet_result_rows = attrs[:result_rows] || spreadsheet.result_rows
     @calculation_configs = table_config.calculation_configs
   end
 
@@ -43,24 +44,27 @@ class FrozenResultTable
       row = spreadsheet_result_row_by(calculation_config_id: config.id)
       FrozenResultTableRow.new(result_header: frozen_result_table_header.result_header,
                                calculation_config: config,
+                               spreadsheet: spreadsheet,
                                row: row)
     end
   end
+
+  private
 
   def frozen_result_table_header
     FrozenResultTableHeader.new(default_columns: default_columns,
                                 table_config: table_config)
   end
 
-  private
-
   # @returns [SpreadsheetRowResult|nil]
   def spreadsheet_result_row_by(**attrs)
-    row = spreadsheet_result_rows.find_by(calculation_config_id: attrs[:calculation_config_id])
+    id = attrs[:calculation_config_id]
+    row = case spreadsheet_result_rows
+          when Array
+            spreadsheet_result_rows.find { |row| row.calculation_config_id == id }
+          else
+            spreadsheet_result_rows.find_by(calculation_config_id: id)
+          end
     row.presence
-  end
-
-  def default_columns
-    [l(:label_row_result_comment), l(:label_row_result_status), l(:label_row_result_last_editing)]
   end
 end

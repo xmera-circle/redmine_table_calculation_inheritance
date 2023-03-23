@@ -30,22 +30,22 @@ module RedmineTableCalculationInheritance
 
       module InstanceMethods
         ##
-        # Adds the required project type relations needed for inheritated
-        # calculations.
-        #
-        def index
-          super
-          # it may happen, that a project is included in guests, for unkown reasons yet
-          @guests = @project.guests - [@project]
-          @members = @project.guests.prepend(@project)
-        end
-
-        ##
         # Refers to the instance variables in SpreadsheetsController#index
         # but renders results.html.erb
         #
         def results
           index
+
+          project_guests = @project.guests
+          # it may happen, that a project is included in guests, for unkown reasons yet
+          @guests = project_guests - [@project]
+          @members = project_guests.prepend(@project)
+          @spreadsheet_result_rows = @spreadsheet.result_rows
+          @spreadsheet_query = SpreadsheetQuery.new(host_project: @project,
+                                                    host_spreadsheet: @spreadsheet,
+                                                    guest_projects: @guests)
+          @spreadsheet_row_result_query = SpreadsheetRowResultQuery.new(host_spreadsheet: @spreadsheet,
+                                                                        guest_projects: @guests)
         end
       end
     end

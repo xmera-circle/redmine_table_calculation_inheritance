@@ -19,18 +19,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class SpreadsheetRowResult < ActiveRecord::Base
-  include Redmine::I18n
+  include RedmineTableCalculation::CalculationUtils
   include Redmine::SafeAttributes
+  include Redmine::I18n
   acts_as_customizable
 
   belongs_to :calculation_config
   belongs_to :spreadsheet
   belongs_to :author, class_name: 'User'
 
+  validates :comment, presence: true
+
   after_validation :update_status
   after_destroy :destroy_adapted_row_values
 
-  validates :comment, presence: true
+  delegate :table_config, to: :spreadsheet
+  delegate :calculation_configs, to: :table_config
 
   safe_attributes(
     :author_id,
@@ -59,7 +63,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   end
 
   def available_custom_fields
-    CustomField.where(id: column_ids).sorted.to_a
+    CustomField.where(id: calculation_column_ids).sorted.to_a
   end
 
   private
@@ -68,13 +72,6 @@ class SpreadsheetRowResult < ActiveRecord::Base
     return if new_record?
 
     self.status = custom_field_values_changed? ? 3 : 2
-  end
-
-  ##
-  # TODO: delegate to table
-  #
-  def column_ids
-    spreadsheet&.table_config&.column_ids
   end
 
   def destroy_adapted_row_values

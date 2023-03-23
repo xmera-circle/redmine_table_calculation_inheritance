@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
+# Copyright (C) 2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,27 +18,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-class AggregatedResultTableRow < ResultTableRow
+class SpreadsheetRowResultQuery
+  attr_reader :relation, :host_spreadsheet, :host_project, :guest_projects
+
   def initialize(**attrs)
-    super(**attrs)
-    @size = attrs[:size]
+    @relation = SpreadsheetRowResult.includes(:calculation_config, spreadsheet: [:project, { rows: [:custom_values] }])
+    @host_spreadsheet = attrs[:host_spreadsheet]
+    @guest_projects = attrs[:guest_projects]
   end
 
-  def calculate
-    results = super
-    return results if results.count == size
-
-    results.append(empty_cells).flatten
+  # @note As long as the spreadsheet name is unique for each object there will
+  #       be no more than one spreadsheet for each object. This assumes also
+  #       that there are no typos in a certain spreadsheet name.
+  def spreadsheet_row_results
+    relation
+      .where(spreadsheet: { project_id: guest_project_ids, name: host_spreadsheet.name })
   end
 
   private
 
-  attr_reader :size
-
-  # Empty cells as placeholders for table field values not yet stored
-  def empty_cells
-    (1..(size - 1)).map do |index|
-      SpareTableCell.new(value: nil, column_index: index, row_index: calculation_config_id)
-    end
+  def guest_project_ids
+    guest_projects.map(&:id)
   end
 end

@@ -18,44 +18,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-class MembersResultTable < SpreadsheetResultTable
-  attr_reader :name, :guests, :project
-
-  def initialize(guests, project, spreadsheet)
-    @guests = guests
-    @project = project
-    @name = spreadsheet.name
-    super(spreadsheet)
+class CalculatedResultTable < FrozenResultTable
+  def initialize(**attrs)
+    super(**attrs)
+    @data_table = DataTable.new(spreadsheet: spreadsheet)
   end
 
-  ##
-  # Rows are collected over guest spreadsheets. Hence,
-  # all calculations will be based on these rows.
-  #
-  def rows(_calculation_config_id = nil)
-    collection = project_spreadsheet_rows
-    guests.each do |guest|
-      collection << guest_rows(guest)
+  # Result rows, one for each calculation.
+  def rows
+    calculation_configs.map do |calculation|
+      calculated_row(calculation)
     end
-    collection.flatten.compact
   end
 
-  def guest_rows(guest)
-    guest_result_rows(guest)
-  end
-
-  def guest_result_rows(guest)
-    results = spreadsheet_of(guest)&.result_rows&.split&.flatten
-    results.presence
-  end
-
-  def project_spreadsheet_rows
-    spreadsheet&.rows&.split&.flatten
+  def calculated_row(calculation)
+    CalculatedResultTableRow.new(result_header: frozen_result_table_header.result_header,
+                                 calculation_config: calculation,
+                                 spreadsheet: spreadsheet,
+                                 data_table: data_table)
   end
 
   private
 
-  def spreadsheet_of(guest)
-    guest.spreadsheets.find_by(name: name)
-  end
+  attr_reader :data_table
 end

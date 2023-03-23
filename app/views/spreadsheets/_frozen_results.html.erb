@@ -39,8 +39,7 @@
             <% end %>
             <%= tag.td class: 'buttons' do %>
               <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
-                <% cfv = custom_field_values_of(row.id) %>
-                <%= link_to l(:button_edit),(row.id.present? ? edit_spreadsheet_row_result_path(row.id) :  new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: table.spreadsheet, calculation_config_id: row.calculation_config.id, cfv: cfv)), :class => 'icon icon-edit' %>
+                <%= link_to l(:button_edit),(row.id.present? ? edit_spreadsheet_row_result_path(row.id) :  new_project_spreadsheet_spreadsheet_row_result_path(row.result_params)), :class => 'icon icon-edit' %>
               <% end %>
             <% end %>
           <% end %>

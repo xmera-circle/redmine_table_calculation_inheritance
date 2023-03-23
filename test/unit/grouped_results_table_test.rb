@@ -21,7 +21,7 @@
 require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
-  class AggregatedResultTableTest < UnitTestCase
+  class GroupedResultsTableTest < UnitTestCase
     fixtures :projects,
              :members, :member_roles, :roles, :users
 
@@ -37,23 +37,32 @@ module RedmineTableCalculationInheritance
       prepare_guest_spreadsheet_column_contents
       prepare_host_frozen_result_values
       prepare_guest_frozen_result_values
-      @aggregated_result_table =
-        AggregatedResultTable.new(projects: @projects,
-                                  spreadsheet: spreadsheet_by(@host_project, 'Fruit Store'))
+      @host_spreadsheet = spreadsheet_by(@host_project, 'Fruit Store')
+      @guest_spreadsheet = spreadsheet_by(@guest_project, 'Fruit Store')
+      @data_table = DataTable.new(spreadsheet: @host_spreadsheet)
+      @result_table = ResultTable.new(data_table: @data_table)
+      @members = @host_project.guests.prepend(@host_project)
+      @query = SpreadsheetRowResultQuery.new(projects: @members,
+                                             spreadsheet: @host_spreadsheet)
+      @grouped_result_table =
+        GroupedResultsTable.new(query: @query,
+                                spreadsheet: @host_spreadsheet,
+                                result_table: @result_table)
     end
 
-    test 'should return header' do
-      expected_names =  ['Calculation', 'Quality', 'Amount', 'Price', 'Status']
-      assert_equal expected_names, @aggregated_result_table.header.map(&:name)
+    test 'should get grouped rows' do
+      grouped_rows = @grouped_result_table.send(:grouped_rows)
+      expected_spreadsheet_ids = [@host_spreadsheet.id, @guest_spreadsheet.id]
+      assert_equal expected_spreadsheet_ids, grouped_rows.keys.map(&:id)
+      expected_result_row_ids = [@host_spreadsheet.result_row_ids, @guest_spreadsheet.result_row_ids].flatten
+      assert_equal expected_result_row_ids, grouped_rows.values.flatten.map(&:id)
     end
 
-    test 'should return calculated row values' do
-      expected_values = [
-        ['Calculate maximum quality', @enumeration_values.last, '', '', ''],
-        ['Calculate minimum price', nil, nil, nil, nil],
-        ['Calculate sum of amount', '', 39, '', '']
-      ]
-      assert_equal expected_values, (@aggregated_result_table.rows.map { |row| row.map(&:value) })
+    test 'should get rows' do
+      rows = @grouped_result_table.rows
+      assert_equal Spreadsheet, rows.keys.map(&:class).uniq[0]
+      assert_equal 6, rows.values.flatten.count
+      assert_equal FrozenResultTableRow, rows.values.flatten.map(&:class).uniq[0]
     end
   end
 end

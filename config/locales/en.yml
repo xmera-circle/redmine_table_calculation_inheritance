@@ -8,6 +8,7 @@ en:
   label_single_calculation_results: Single Calculation Results
   label_row_result_comment: Rational
   label_row_result_status: Status
+  label_row_result_status_unfrozen: Not frozen 
   label_row_result_last_editing: Last Editing
   label_row_result_status_new: New
   label_row_result_status_unchanged: Unchanged

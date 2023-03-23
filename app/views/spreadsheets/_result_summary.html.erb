@@ -33,7 +33,7 @@
   <%= tag.legend do %>
     <%= tag.strong l(:label_aggregated_result_plural) %>
   <% end %>
-  <%= render_inheritated_result_table(members, spreadsheet) %>
+  <%= render_aggregated_result_table(spreadsheet_row_result_query, spreadsheet_result_rows, project, spreadsheet) %>
 <% end %>
 
 
@@ -41,11 +41,5 @@
   <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
     <%= tag.strong l(:label_single_calculation_results) %>
   </legend>
-  <% members.each do |member| %>
-    <% spreadsheet = spreadsheet_of(member) %>
-    <% unless spreadsheet.nil? %>
-      <%= tag.h3 link_to("#{member.project_type.name} - #{member.name}",project_spreadsheet_path(member, spreadsheet) ), style: 'margin-top: 1rem; font-weight:bold'%>
-      <%= render_frozen_result_table(member, spreadsheet) %>                                        
-    <% end %>
-  <% end %>
+  <%= render_grouped_results_table(spreadsheet_query, spreadsheet) %>
 </fieldset>

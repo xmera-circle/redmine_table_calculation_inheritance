@@ -18,23 +18,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module InheritanceSpreadsheetsHelper
-  def render_frozen_result_table(project, spreadsheet)
-    render partial: 'frozen_results',
-           locals: { table: FrozenResultTable.new(spreadsheet: spreadsheet),
-                     project: project }
+class CalculatedResultTableRow < FrozenResultTableRow
+  # @return [Array(ResultTableCell)] The calculated row for the underlying spreadsheet.
+  def initialize(**attrs)
+    super(**attrs)
+    @data_table = attrs[:data_table]
   end
 
-  def render_aggregated_result_table(query, spreadsheet_result_rows, project, spreadsheet)
-    aggregated_data_table = AggregatedDataTable.new(spreadsheet: spreadsheet, query: query)
-    render partial: 'aggregated_results',
-           locals: { table: ResultTable.new(data_table: aggregated_data_table),
-                     spreadsheet_result_rows: spreadsheet_result_rows,
-                     project: project }
+  def result_cells
+    result_row = ResultTable.new(data_table: data_table)
+                            .send(:result_row, calculation_config)
+                            .calculate
+    result_row.delete_at(0) # calculation name column
+    result_row
   end
 
-  def render_grouped_results_table(query, spreadsheet)
-    render partial: 'grouped_results',
-           locals: { table: GroupedResultsTable.new(query: query, spreadsheet: spreadsheet) }
-  end
+  private
+
+  attr_reader :data_table
 end

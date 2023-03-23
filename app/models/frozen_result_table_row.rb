@@ -19,10 +19,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class FrozenResultTableRow
+  include Redmine::I18n
   include Enumerable
-  attr_reader :result_header, :row, :calculation_config
+  attr_reader :result_header, :row, :calculation_config, :spreadsheet
 
-  delegate :id, :spreadsheet, :author, :visible?, to: :row, allow_nil: true
+  delegate :id, :author, :visible?, to: :row, allow_nil: true
 
   # @param result_header [FrozenResultTableHeader#result_header] ResultTableHeader columns.
   # @param row [SpreadsheetRowResult] The SpreadsheetRowResult object.
@@ -30,7 +31,8 @@ class FrozenResultTableRow
   def initialize(**attrs)
     @result_header = attrs[:result_header]
     @row = attrs[:row]
-    @calculation_config = attrs[:calculation_config] || row&.calculation_config
+    @calculation_config = attrs[:calculation_config]
+    @spreadsheet = attrs[:spreadsheet]
   end
 
   # All cells (empty or not) for the underlying calculation
@@ -44,6 +46,13 @@ class FrozenResultTableRow
                                        row_index: calculation_config_id))
   end
 
+  # Controller params for preparing a new SpreadsheetRowResult record
+  def result_params
+    { spreadsheet_id: spreadsheet.id,
+      calculation_config_id: calculation_config_id,
+      cfv: {} }
+  end
+
   # Allows to iterate through FrozenResultTableCell instances
   def each(&block)
     cells.each(&block)
@@ -54,11 +63,24 @@ class FrozenResultTableRow
   delegate :id, to: :calculation_config, prefix: true, allow_nil: true
   delegate :size, to: :result_header, prefix: true
 
-  # Stored results of table fields
   def result_cells
     return [] unless row
+    return stored_result_cells if result_column_gaps.none?
 
-    row.custom_field_values.map do |custom_field_value|
+    result_column_gaps.each do |position|
+      next if position.zero?
+
+      cell = SpareTableCell.new(value: nil, column_index: position, row_index: calculation_config_id)
+      @stored_result_cells << cell
+    end
+    @stored_result_cells.sort_by(&:column_index)
+  end
+
+  # Stored results of table fields or calculated row of ResultTable if any
+  def stored_result_cells
+    return [] unless row
+
+    @stored_result_cells ||= row.custom_field_values.map do |custom_field_value|
       custom_field = custom_field_value.custom_field
       if result_column_names.include? custom_field.name
         FrozenResultTableCell.new(custom_field_value: custom_field_value)
@@ -66,6 +88,14 @@ class FrozenResultTableRow
         SpareTableCell.new(value: nil, column_index: custom_field.position, row_index: calculation_config_id)
       end
     end
+  end
+
+  def result_column_gaps
+    result_column_positions - result_cell_positions
+  end
+
+  def result_cell_positions
+    stored_result_cells.map(&:column_index)
   end
 
   # Builds cells consisting of result cells or empty cells and default cells.
@@ -89,7 +119,9 @@ class FrozenResultTableRow
   # SpreadsheetRowResult default attributes which should be always rendered
   def default_cells(offset)
     %w[comment status updated_on].each_with_index.map do |attr, index|
-      SpareTableCell.new(value: row&.send(attr) || nil, column_index: offset + index, row_index: calculation_config_id)
+      SpareTableCell.new(value: row&.send(attr) || send(attr),
+                         column_index: offset + index + 1,
+                         row_index: calculation_config_id)
     end
   end
 
@@ -97,5 +129,23 @@ class FrozenResultTableRow
     return [] unless result_header
 
     result_header.map(&:name)
+  end
+
+  def result_column_positions
+    return [] unless result_header
+
+    result_header.map(&:position)
+  end
+
+  def comment
+    nil
+  end
+
+  def status
+    l(:label_row_result_status_unfrozen)
+  end
+
+  def updated_on
+    nil
   end
 end

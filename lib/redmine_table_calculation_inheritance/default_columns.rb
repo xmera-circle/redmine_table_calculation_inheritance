@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation Inheritance.
+# This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
+# Copyright (C) 2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,31 +18,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-class MemberResultTable < SpreadsheetResultTable
-  attr_reader :name, :member
-
-  def initialize(member, spreadsheet)
-    @name = spreadsheet.name
-    @member = member
-    super(spreadsheet)
-  end
-
-  ##
-  # Rows are collected over member spreadsheets. Hence,
-  # all calculations will be based on these rows.
-  #
-  def rows(_calculation_config_id = nil)
-    collection = []
-    collection << member_rows
-    collection.flatten.compact
-  end
-
-  def member_rows
-    member_result_rows
-  end
-
-  def member_result_rows
-    results = spreadsheet&.result_rows&.split&.flatten
-    results.presence
+module RedmineTableCalculationInheritance
+  # Default columns of SpreadsheetRowResult table
+  module DefaultColumns
+    def default_columns
+      [l(:label_row_result_comment), l(:label_row_result_status), l(:label_row_result_last_editing)]
+    end
   end
 end

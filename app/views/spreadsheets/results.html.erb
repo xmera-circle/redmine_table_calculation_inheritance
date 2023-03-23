@@ -20,8 +20,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<%= render partial: 'inherited_calculation', locals: { project: @project,
-                                                       spreadsheet: @spreadsheet,
-                                                       members: @members } %>
+<%= render partial: 'result_summary', locals: { project: @project,
+                                                spreadsheet: @spreadsheet,
+                                                spreadsheet_result_rows: @spreadsheet_result_rows,
+                                                spreadsheet_query: @spreadsheet_query,
+                                                spreadsheet_row_result_query: @spreadsheet_row_result_query,
+                                                members: @members } %>
 
 <%= render partial: 'sidebar' %>

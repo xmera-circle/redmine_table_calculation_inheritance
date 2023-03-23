@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation.
-#
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
@@ -18,8 +16,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-class DefaultColumnCell < SpareTableCell
-  def column_id
-    nil
+class AggregatedDataTableRow < DataTableRow
+  include RedmineTableCalculation::CalculationUtils
+
+  attr_reader :calculation_configs
+
+  def initialize(**attrs)
+    super(**attrs)
+    @calculation_configs = attrs[:calculation_configs]
+  end
+
+  def cells
+    data_table_cells
+  end
+
+  def data_table_cells
+    @data_table_cells ||= row.custom_field_values.map do |custom_field_value|
+      next unless calculable?(custom_field_value.custom_field)
+
+      DataTableCell.new(custom_field_value: custom_field_value)
+    end
+    @data_table_cells.compact
   end
 end
