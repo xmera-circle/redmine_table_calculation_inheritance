@@ -77,9 +77,9 @@ class AggregatedDataTable < DataTable
     end
   end
 
-  def host_rows(calculation_config)
-    row = find_result_rows_by(spreadsheet.result_rows, calculation_config).presence
-    row || spreadsheet_rows
+  # Host data are always calculated from spreadsheet
+  def host_rows(_calculation_config)
+    spreadsheet_rows
   end
 
   def find_result_rows_by(rows, calculation_config)

@@ -90,12 +90,8 @@ class GroupedResultsTable
     grouped_rows
   end
 
+  # Host data are always calculated from spreadsheet
   def host_rows
-    if spreadsheet.result_rows.presence
-      FrozenResultTable.new(spreadsheet: spreadsheet,
-                            result_rows: spreadsheet.result_rows).rows
-    else
-      CalculatedResultTable.new(spreadsheet: spreadsheet).rows
-    end
+    CalculatedResultTable.new(spreadsheet: spreadsheet).rows
   end
 end
