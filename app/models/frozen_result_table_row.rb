@@ -35,7 +35,14 @@ class FrozenResultTableRow
     @spreadsheet = attrs[:spreadsheet]
   end
 
-  # All cells (empty or not) for the underlying calculation
+  # All cells (empty or not) for the underlying calculation:
+  #
+  # result_cells may contain SpareTableCell instances as placeholder for
+  # non required cells in dependence of the calculation config.
+  #
+  # default_cells refer to cells which are independent of the calculation
+  # config.
+  #
   def cells
     results = result_cells
     offset = results.size
@@ -77,7 +84,7 @@ class FrozenResultTableRow
     @stored_result_cells.sort_by(&:column_index)
   end
 
-  # Stored results of table fields or calculated row of ResultTable if any
+  # Stored result of table fields or calculated row of ResultTable if any
   def stored_result_cells
     return [] unless row
 
@@ -92,10 +99,10 @@ class FrozenResultTableRow
   end
 
   def result_column_gaps
-    result_column_positions - result_cell_positions
+    result_column_positions - stored_result_cell_positions
   end
 
-  def result_cell_positions
+  def stored_result_cell_positions
     stored_result_cells.map(&:column_index)
   end
 

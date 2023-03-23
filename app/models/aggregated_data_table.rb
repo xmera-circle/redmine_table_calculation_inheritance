@@ -35,34 +35,54 @@ class AggregatedDataTable < DataTable
   end
 
   def columns
-    transpose_rows.map do |column|
-      DataTableColumn.new(column: column, table_config: table_config)
+    calculation_configs.each_with_object({}) do |calculation_config, hash|
+      hash[calculation_config] = transpose_rows(calculation_config).map do |column|
+        DataTableColumn.new(column: column, table_config: table_config)
+      end
+      hash
     end
   end
 
-  def rows
-    data_table_rows = host_result_rows
-    data_table_rows << guests_result_rows
-    data_table_rows.flatten.compact
+  def transpose_rows(calculation_config)
+    rows(calculation_config).map(&:cells).transpose
+  end
+
+  def rows(calculation_config)
+    data_table_rows(calculation_config)
   end
 
   private
 
-  def guests_result_rows
-    return unless spreadsheet_result_rows.presence
+  def data_table_rows(calculation_config)
+    table_rows = host_result_rows(calculation_config)
+    table_rows << guests_result_rows(calculation_config)
+    table_rows.flatten.compact
+  end
 
-    spreadsheet_result_rows.map do |row|
-      AggregatedDataTableRow.new(row: row, calculation_configs: calculation_configs)
+  def guests_result_rows(calculation_config)
+    return if spreadsheet_result_rows.none?
+
+    find_result_rows_by(spreadsheet_result_rows, calculation_config).map do |row|
+      AggregatedDataTableRow.new(row: row,
+                                 calculation_config: calculation_config,
+                                 calculation_columns: calculation_columns)
     end
   end
 
-  def host_result_rows
-    host_rows.map do |row|
-      AggregatedDataTableRow.new(row: row, calculation_configs: calculation_configs)
+  def host_result_rows(calculation_config)
+    host_rows(calculation_config).map do |row|
+      AggregatedDataTableRow.new(row: row,
+                                 calculation_config: calculation_config,
+                                 calculation_columns: calculation_columns)
     end
   end
 
-  def host_rows
-    spreadsheet.result_rows.presence || spreadsheet_rows
+  def host_rows(calculation_config)
+    row = find_result_rows_by(spreadsheet.result_rows, calculation_config).presence
+    row || spreadsheet_rows
+  end
+
+  def find_result_rows_by(rows, calculation_config)
+    rows&.where(calculation_config_id: calculation_config.id)
   end
 end
