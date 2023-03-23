@@ -21,19 +21,19 @@
 class CalculatedResultTable < FrozenResultTable
   def initialize(**attrs)
     super(**attrs)
-    @data_table = DataTable.new(spreadsheet: spreadsheet)
+    @data_table = attrs[:data_table] || DataTable.new(spreadsheet: spreadsheet)
   end
 
   # Result rows, one for each calculation.
   def rows
-    calculation_configs.map do |calculation|
-      calculated_row(calculation)
+    calculation_configs.map do |calculation_config|
+      calculated_row(calculation_config)
     end
   end
 
-  def calculated_row(calculation)
+  def calculated_row(calculation_config)
     CalculatedResultTableRow.new(result_header: frozen_result_table_header.result_header,
-                                 calculation_config: calculation,
+                                 calculation_config: calculation_config,
                                  spreadsheet: spreadsheet,
                                  data_table: data_table)
   end

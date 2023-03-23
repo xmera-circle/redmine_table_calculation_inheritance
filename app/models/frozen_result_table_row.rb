@@ -63,6 +63,7 @@ class FrozenResultTableRow
   delegate :id, to: :calculation_config, prefix: true, allow_nil: true
   delegate :size, to: :result_header, prefix: true
 
+  # Fills the gaps between result columns and columns of the stored result.
   def result_cells
     return [] unless row
     return stored_result_cells if result_column_gaps.none?

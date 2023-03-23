@@ -40,10 +40,10 @@ class FrozenResultTable
 
   # Result rows, one for each calculation.
   def rows
-    calculation_configs.map do |config|
-      row = spreadsheet_result_row_by(calculation_config_id: config.id)
+    calculation_configs.map do |calculation_config|
+      row = spreadsheet_result_row_by(calculation_config_id: calculation_config.id)
       FrozenResultTableRow.new(result_header: frozen_result_table_header.result_header,
-                               calculation_config: config,
+                               calculation_config: calculation_config,
                                spreadsheet: spreadsheet,
                                row: row)
     end

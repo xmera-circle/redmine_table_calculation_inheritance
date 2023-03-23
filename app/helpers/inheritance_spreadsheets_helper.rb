@@ -33,8 +33,10 @@ module InheritanceSpreadsheetsHelper
                      project: project }
   end
 
-  def render_grouped_results_table(query, spreadsheet)
+  def render_grouped_results_table(query, spreadsheet, data_table)
     render partial: 'grouped_results',
-           locals: { table: GroupedResultsTable.new(query: query, spreadsheet: spreadsheet) }
+           locals: { table: GroupedResultsTable.new(query: query,
+                                                    spreadsheet: spreadsheet,
+                                                    data_table: data_table) }
   end
 end
