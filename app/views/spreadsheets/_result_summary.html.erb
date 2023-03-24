@@ -24,7 +24,7 @@
 
 <%= tag.fieldset do %>
   <%= tag.legend do %>
-    <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{l(:label_updated_time, time_tag(spreadsheet.updated_on))})".html_safe %>
+    <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{date_and_author(spreadsheet_result_rows)})".html_safe %>
   <% end %>
   <%= render_frozen_result_table(project, spreadsheet) %>
 <% end %>
@@ -35,7 +35,6 @@
   <% end %>
   <%= render_aggregated_result_table(spreadsheet_row_result_query, spreadsheet_result_rows, project, spreadsheet) %>
 <% end %>
-
 
 <fieldset class="collapsible collapsed" style="padding: 0;">
   <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">

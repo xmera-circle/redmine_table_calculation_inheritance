@@ -13,7 +13,7 @@
         <% table.rows.each do |row| %> 
           <%= content_tag :tr do %>
             <% row.each do |cell| %>
-              <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }) %>
+              <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }, title: cell.description) %>
             <% end %>
             <%= tag.td class: 'buttons' do %>
               <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 

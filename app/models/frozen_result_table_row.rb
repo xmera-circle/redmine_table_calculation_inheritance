@@ -49,6 +49,7 @@ class FrozenResultTableRow
     results = build_cells(results, offset)
     results.flatten!
     results.prepend(SpareTableCell.new(value: calculation_config&.name,
+                                       description: calculation_config.description,
                                        column_index: 0,
                                        row_index: calculation_config_id))
   end

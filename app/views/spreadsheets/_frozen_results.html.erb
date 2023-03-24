@@ -28,18 +28,20 @@
           <% table.header.each do |column| %>
             <%= content_tag(:th, column.name, class: 'name', title: column.description) %>
           <% end %>
-            <%= content_tag(:th, '') %>
+            <%= content_tag(:th, '') if editable? %>
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
         <% table.rows.each do |row| %> 
           <%= content_tag :tr do %>
             <% row.each do |cell| %>
-              <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }) %>
+              <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }, title: cell.description) %>
             <% end %>
-            <%= tag.td class: 'buttons' do %>
-              <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
-                <%= link_to l(:button_edit),(row.id.present? ? edit_spreadsheet_row_result_path(row.id) :  new_project_spreadsheet_spreadsheet_row_result_path(row.result_params)), :class => 'icon icon-edit' %>
+            <% if editable? %>
+              <%= tag.td class: 'buttons' do %>
+                <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
+                  <%= link_to l(:button_edit),(row.id.present? ? edit_spreadsheet_row_result_path(row.id) :  new_project_spreadsheet_spreadsheet_row_result_path(row.result_params)), :class => 'icon icon-edit' %>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>

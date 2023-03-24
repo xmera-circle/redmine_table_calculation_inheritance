@@ -25,7 +25,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   acts_as_customizable
 
   belongs_to :calculation_config
-  belongs_to :spreadsheet
+  belongs_to :spreadsheet, inverse_of: :result_rows
   belongs_to :author, class_name: 'User'
 
   validates :comment, presence: true
