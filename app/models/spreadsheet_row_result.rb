@@ -62,8 +62,19 @@ class SpreadsheetRowResult < ActiveRecord::Base
     true
   end
 
+  # @overridden Redmine::Acts::Customizable#available_custom_fields
   def available_custom_fields
     CustomField.where(id: calculation_column_ids).sorted.to_a
+  end
+
+  # Compare given custom field values with their current values.
+  # Format: {"custom_field1.id" => "value1", "custom_field2.id" => "value2"}
+  #
+  # @example values.to_unsafe_hash
+  #          {"28"=>"56", "44"=>"58", "45"=>"62"}
+  #
+  def changed_custom_field_values?(values)
+    current_custom_field_values != given_custom_field_values(values)
   end
 
   private
@@ -72,6 +83,21 @@ class SpreadsheetRowResult < ActiveRecord::Base
     return if new_record?
 
     self.status = custom_field_values_changed? ? 3 : 2
+  end
+
+  def current_custom_field_values
+    values = custom_field_values.each_with_object({}) do |custom_field_value, hash|
+      value = custom_field_value.value
+      custom_field = custom_field_value.custom_field
+      hash[custom_field.id.to_s] = value if value
+      hash
+    end
+    values.sort.to_h
+  end
+
+  def given_custom_field_values(values)
+    safe = values.respond_to?(:to_unsafe_hash) ? values.to_unsafe_hash : values
+    safe.sort.to_h
   end
 
   def destroy_adapted_row_values

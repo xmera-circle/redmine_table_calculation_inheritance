@@ -27,7 +27,7 @@
                      end
                   %>
                   <%= link_to l(:label_inherit),
-                      result_row ? spreadsheet_row_result_path(id: result_row.id, calculation_config_id: calculation_config_id, cfv: cfv) : new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet.id, calculation_config_id: calculation_config_id, spreadsheet_row_result: { custom_field_values: cfv }), 
+                      result_row ? spreadsheet_row_result_path(id: result_row.id, spreadsheet_row_result: { custom_field_values: cfv, calculation_config_id: calculation_config_id }) : new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet.id, spreadsheet_row_result: {  calculation_config_id: calculation_config_id, custom_field_values: cfv }), 
                       method: result_row&.id.present? ? :patch : :get,
                       class: 'icon icon-checked',
                       title: l(:label_inherit) %>

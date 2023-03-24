@@ -73,11 +73,15 @@ class SpreadsheetRowResultsController < ApplicationController
 
   private
 
+  # Saves custom field values only if they have changed!
   def update_row_result_attributes
-    @spreadsheet_row_result.safe_attributes = {
-      custom_field_values: params[:cfv] || {}
-    }
-    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
+    cfv = params[:spreadsheet_row_result][:custom_field_values]
+    attributes = if @spreadsheet_row_result.changed_custom_field_values?(cfv)
+                   params[:spreadsheet_row_result]
+                 else
+                   params[:spreadsheet_row_result].except(:custom_field_values)
+                 end
+    @spreadsheet_row_result.safe_attributes = attributes
   end
 
   def new_row
