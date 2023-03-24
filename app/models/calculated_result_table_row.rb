@@ -36,4 +36,8 @@ class CalculatedResultTableRow < FrozenResultTableRow
   private
 
   attr_reader :data_table
+
+  def status
+    nil
+  end
 end

@@ -10,9 +10,8 @@ en:
   label_row_result_status: Status
   label_row_result_status_unfrozen: Not frozen 
   label_row_result_last_editing: Last Editing
-  label_row_result_status_new: New
-  label_row_result_status_unchanged: Unchanged
-  label_row_result_status_changed: Changed
+  label_row_result_status_edited: Edited
+  label_row_result_status_review: Review
 
   permission_view_spreadsheet_results: View calcualation results
   permission_edit_spreadsheet_results: Edit calculation results 

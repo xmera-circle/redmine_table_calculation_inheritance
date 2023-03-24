@@ -31,10 +31,12 @@ class SpreadsheetRowResult < ActiveRecord::Base
   validates :comment, presence: true
 
   after_validation :update_status
+  after_validation :change_hosts_status
   after_destroy :destroy_adapted_row_values
 
-  delegate :table_config, to: :spreadsheet
+  delegate :table_config, :project, to: :spreadsheet
   delegate :calculation_configs, to: :table_config
+  delegate :host_ids, to: :project
 
   safe_attributes(
     :author_id,
@@ -45,9 +47,8 @@ class SpreadsheetRowResult < ActiveRecord::Base
     :comment
   )
 
-  STATUS = { label_row_result_status_new: 1,
-             label_row_result_status_unchanged: 2,
-             label_row_result_status_changed: 3 }.freeze
+  STATUS = { label_row_result_status_edited: 1,
+             label_row_result_status_review: 2 }.freeze
 
   # Translates the database value for status via the mapped
   # label in an understandable value for the user.
@@ -79,10 +80,15 @@ class SpreadsheetRowResult < ActiveRecord::Base
 
   private
 
+  # Updates status to: 1 <=> edited when the user has edited the record.
+  #
+  # This method assumes that the user is not able to set the status by himself.
+  # If the status would change than it is controlled through the codebase and
+  # this change would pass.
   def update_status
     return if new_record?
 
-    self.status = custom_field_values_changed? ? 3 : 2
+    self.status = 1 unless status_changed?
   end
 
   def current_custom_field_values
@@ -103,4 +109,20 @@ class SpreadsheetRowResult < ActiveRecord::Base
   def destroy_adapted_row_values
     CustomValue.where(customized_id: id).delete_all
   end
+
+  # Host instances of SpreadsheetRowResult will be marked to be reviewed.
+  #
+  # rubocop:disable Rails/SkipsModelValidations
+  def change_hosts_status
+    return unless custom_field_values_changed?
+
+    SpreadsheetRowResult.no_touching do
+      SpreadsheetRowResult
+        .includes(:calculation_config, spreadsheet: [project: [:hosts]])
+        .where(calculation_config: calculation_config_id,
+               spreadsheet: { project_id: host_ids, name: spreadsheet.name })
+        .update_all(status: 2)
+    end
+  end
+  # rubocop:enable Rails/SkipsModelValidations
 end

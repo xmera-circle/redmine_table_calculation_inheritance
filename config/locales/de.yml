@@ -10,9 +10,8 @@ de:
   label_row_result_status: Status
   label_row_result_last_editing: Letze Bearbeitung
   label_row_result_status_unfrozen: Nicht festgeschrieben
-  label_row_result_status_new: Neu
-  label_row_result_status_unchanged: Unverändert
-  label_row_result_status_changed: Verändert
+  label_row_result_status_edited: Bearbeitet
+  label_row_result_status_review: Überprüfen
 
   permission_view_spreadsheet_results: Aggregierte Berechnungsergebnisse anzeigen
   permission_edit_spreadsheet_results: Aggregierte Berechnungsergebnisse bearbeiten

@@ -127,7 +127,8 @@ class FrozenResultTableRow
   # SpreadsheetRowResult default attributes which should be always rendered
   def default_cells(offset)
     %w[comment status updated_on].each_with_index.map do |attr, index|
-      SpareTableCell.new(value: row&.send(attr) || send(attr),
+      SpareTableCell.new(name: attr,
+                         value: row&.send(attr) || send(attr),
                          column_index: offset + index + 1,
                          row_index: calculation_config_id)
     end
