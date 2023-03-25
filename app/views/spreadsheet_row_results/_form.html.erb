@@ -32,7 +32,14 @@
       <% end %>
     <% end %>
     <%= tag.p f.text_area :comment, size: '6x6', required: true %>
-    <%= f.hidden_field :calculation_config_id %>
+    <% if %w[edit update].include?(action_name) %>
+      <%= tag.p do %>
+        <%= field.check_box :reviewed %>
+        <%= field.label l(:field_reviewed) %>
+        <%= tag.em l(:info_text_field_reviewed), class: 'info' %>
+      <% end %>
+    <% end %>
+    <%= field.hidden_field :calculation_config_id %>
   <% end %>
 <% end %>
 

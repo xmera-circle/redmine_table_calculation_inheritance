@@ -22,6 +22,9 @@ class SpreadsheetRowResult < ActiveRecord::Base
   include RedmineTableCalculation::CalculationUtils
   include Redmine::SafeAttributes
   include Redmine::I18n
+
+  attr_accessor :reviewed
+
   acts_as_customizable
 
   belongs_to :calculation_config
@@ -30,8 +33,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
 
   validates :comment, presence: true
 
-  after_validation :update_status
-  after_validation :change_hosts_status
+  after_validation :update_status, :change_hosts_status, :touch_updated_on
   after_destroy :destroy_adapted_row_values
 
   delegate :table_config, :project, to: :spreadsheet
@@ -44,7 +46,8 @@ class SpreadsheetRowResult < ActiveRecord::Base
     :calculation_config_id,
     :custom_fields,
     :custom_field_values,
-    :comment
+    :comment,
+    :reviewed
   )
 
   STATUS = { label_row_result_status_edited: 1,
@@ -127,4 +130,20 @@ class SpreadsheetRowResult < ActiveRecord::Base
     end
   end
   # rubocop:enable Rails/SkipsModelValidations
+
+  # Will touch the last processing date even if no data have changed.
+  # This is useful to explicitly mark a record as reviewed.
+  #
+  # rubocop:disable Rails/SkipsModelValidations
+  def touch_updated_on
+    touch if reviewed?
+  end
+  # rubocop:enable Rails/SkipsModelValidations
+
+  # The attribute :reviewed is a kind of boolean (1, 0) submitted
+  # by the edit form. The value is not persistend. It will only be
+  # used to trigger a touch of the record.
+  def reviewed?
+    reviewed.to_i.positive?
+  end
 end

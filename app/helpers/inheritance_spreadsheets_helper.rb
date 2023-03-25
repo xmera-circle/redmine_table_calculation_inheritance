@@ -94,7 +94,7 @@ module InheritanceSpreadsheetsHelper
   def custom_field_values_of(row)
     row.each_with_object({}) do |cell, hash|
       if cell.custom_field
-        hash[cell.custom_field.id] = cell.value
+        hash[cell.custom_field.id.to_s] = cell.value
         hash
       end
     end
