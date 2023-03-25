@@ -102,6 +102,8 @@ class SpreadsheetRowResult < ActiveRecord::Base
   end
 
   def given_custom_field_values(values)
+    return {} if values.blank?
+
     safe = values.respond_to?(:to_unsafe_hash) ? values.to_unsafe_hash : values
     safe.sort.to_h
   end

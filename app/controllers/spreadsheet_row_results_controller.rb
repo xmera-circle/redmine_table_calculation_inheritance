@@ -38,7 +38,11 @@ class SpreadsheetRowResultsController < ApplicationController
     @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
   end
 
-  def edit; end
+  def edit
+    return unless params[:spreadsheet_row_result].presence
+
+    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
+  end
 
   def create
     @spreadsheet_row_result ||= new_row

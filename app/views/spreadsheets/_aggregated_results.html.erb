@@ -16,21 +16,9 @@
               <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }, title: cell.description) %>
             <% end %>
             <%= tag.td class: 'buttons' do %>
-              <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
-                  <% calculation_config_id = row.last.send(:row_index) %>
-                  <% result_row = spreadsheet_result_rows.find_by(calculation_config_id: calculation_config_id ) %>
-                  <% cfv = row.each_with_object({}) do |cell, hash|
-                      if cell.custom_field
-                        hash[cell.custom_field.id] = cell.value
-                        hash
-                      end
-                     end
-                  %>
-                  <%= link_to l(:label_inherit),
-                      result_row ? spreadsheet_row_result_path(id: result_row.id, spreadsheet_row_result: { custom_field_values: cfv, calculation_config_id: calculation_config_id }) : new_project_spreadsheet_spreadsheet_row_result_path(spreadsheet_id: @spreadsheet.id, spreadsheet_row_result: {  calculation_config_id: calculation_config_id, custom_field_values: cfv }), 
-                      method: result_row&.id.present? ? :patch : :get,
-                      class: 'icon icon-checked',
-                      title: l(:label_inherit) %>
+              <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %>
+                <%= inherit_calculated_results(result_row: result_row_of(row, spreadsheet_result_rows),
+                                               spreadsheet_row_result: spreadsheet_row_result_params(row, spreadsheet.id)) %>
               <% end %>
             <% end %>
           <% end %>

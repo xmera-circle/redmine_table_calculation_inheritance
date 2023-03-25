@@ -55,10 +55,12 @@ class FrozenResultTableRow
   end
 
   # Controller params for preparing a new SpreadsheetRowResult record
-  def result_params
+  def new_result_row_params
     { spreadsheet_id: spreadsheet.id,
-      calculation_config_id: calculation_config_id,
-      cfv: {} }
+      spreadsheet_row_result: {
+        custom_field_values: {},
+        calculation_config_id: calculation_config_id
+      } }
   end
 
   # Allows to iterate through FrozenResultTableCell instances
