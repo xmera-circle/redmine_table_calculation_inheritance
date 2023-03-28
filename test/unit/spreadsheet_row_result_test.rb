@@ -22,13 +22,19 @@ require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
   class SpreadsheetRowResultTest < UnitTestCase
-    fixtures :projects, :users
-
     def setup
-      @table_config = TableConfig.generate!
-      @spreadsheet = Spreadsheet.generate!(project_id: Project.find(1).id,
-                                           author_id: User.find(2).id,
-                                           table_config_id: @table_config.id)
+      @admin = users :users_001
+      @jsmith = users :users_002
+      prepare_project_relations
+      prepare_table_config
+      prepare_calculation_config
+      prepare_spreadsheets
+      prepare_host_spreadsheet_column_contents
+      prepare_guest_spreadsheet_column_contents
+      prepare_host_frozen_result_values
+      prepare_guest_frozen_result_values
+      @spreadsheet = spreadsheet_by(@guest_project, 'Fruit Store')
+      @table_config = @spreadsheet.table_config
     end
 
     test 'should have many custom values' do
@@ -38,14 +44,39 @@ module RedmineTableCalculationInheritance
     end
 
     test 'should respond to safe attributes' do
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
+                                        comment: 'First result')
       assert SpreadsheetRowResult.respond_to? :safe_attributes
+      assert row.respond_to?(:author_id), 'Does not respond to :author_id'
+      assert row.respond_to?(:spreadsheet_id), 'Does not respond to :spreadsheet_id'
+      assert row.respond_to?(:calculation_config_id), 'Does not respond to :calculation_config_id'
+      # assert row.respond_to?(:custom_fields), 'Does not respond to :custom_fields'
+      assert row.respond_to?(:custom_field_values), 'Does not respond to :custom_field_values'
+      assert row.respond_to?(:comment), 'Does not respond to :comment'
+      assert row.respond_to?(:reviewed), 'Does not respond to :reviewed'
+    end
+
+    test 'should validate comment' do
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id)
+      assert row.invalid?
+      assert_equal [:comment], row.errors.attribute_names
+    end
+
+    test 'should destroy custom field values when row is destroyed' do
+      rows = @spreadsheet.result_rows
+      row_ids = rows.map(&:id)
+      assert rows.first.custom_field_values.map(&:value).any?
+      custom_values = CustomValue.where(customized_id: row_ids.first)
+      assert custom_values.presence
+      rows.destroy_all
+      custom_values = CustomValue.where(customized_id: row_ids.first)
+      assert_not custom_values.presence
     end
 
     test 'should find TableCustomField instances' do
-      cf = custom_field
-      @table_config.columns << cf
-      row = SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id)
-      assert row.available_custom_fields.count == 1
+      rows = @spreadsheet.result_rows
+      row = rows.first
+      assert_equal %w[Quality Amount Price], row.available_custom_fields.map(&:name)
     end
 
     test 'should have default status' do
@@ -53,27 +84,79 @@ module RedmineTableCalculationInheritance
       @table_config.columns << cf
       row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
                                         comment: 'First result')
-      assert_equal 'New', row.status
+      assert_equal 'Edited', row.status
     end
 
-    test 'should update status to changed when custom field value has changed' do
+    test 'should update status to edited when custom field value has changed' do
       cf = custom_field
       @table_config.columns << cf
       row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
                                         comment: 'First result')
       row.custom_field_values = { cf.id => 'A' }
       row.save!
-      assert_equal 'Changed', row.status
+      assert_equal 'Edited', row.status
     end
 
-    test 'should update status to unchanged when custom field value stayed the same' do
+    test 'should leave status unchanged when custom field value stayed the same' do
       cf = custom_field
       @table_config.columns << cf
       row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
                                         comment: 'First result')
       row.comment = 'Update comment'
       row.save!
-      assert_equal 'Unchanged', row.status
+      assert_equal 'Edited', row.status
+    end
+
+    test 'should have visible custom fields only' do
+      row = SpreadsheetRowResult.create(spreadsheet_id: @spreadsheet.id,
+                                        comment: 'First result')
+      assert row.visible?
+    end
+
+    test 'should detect unchanged custom field values' do
+      guest_rows = @spreadsheet.result_rows
+      row = guest_rows.second
+      # submit unchanged custom_field_values
+      assert_not row.changed_custom_field_values?({ @amount_field.id.to_s => '21' })
+    end
+
+    test 'should change hosts status when custom field values changed' do
+      guest_rows = @spreadsheet.result_rows
+      guest_status = guest_rows.map(&:status)
+      assert_equal %w[Edited Edited], guest_status
+      # reset hosts to status Edited
+      host_rows = spreadsheet_by(@host_project, 'Fruit Store').result_rows
+      host_rows.each do |row|
+        row.status = 1
+        row.save!
+      end
+      host_status = host_rows.map(&:status)
+      assert_equal %w[Edited Edited], host_status
+      # change custom_field_values
+      guest_rows.second.custom_field_values = { @amount_field.id => 25 }
+      guest_rows.second.save!
+      host_rows_reloaded = spreadsheet_by(@host_project, 'Fruit Store').result_rows
+      host_status_reloaded = host_rows_reloaded.map(&:status)
+      assert_equal %w[Edited Review], host_status_reloaded
+    end
+
+    test 'should touch updated_on field when reviewed' do
+      row = SpreadsheetRowResult.create!(spreadsheet_id: @spreadsheet.id,
+                                         comment: '-')
+      current_update = Time.zone.strptime(row.updated_on.to_s, '%Y-%m-%d %H:%M:%S')
+      sleep(1)
+      row.safe_attributes = { author_id: @jsmith.id, reviewed: 1 }
+      row.save!
+      assert_not_equal current_update, Time.zone.strptime(row.updated_on.to_s, '%Y-%m-%d %H:%M:%S')
+    end
+
+    test 'should not touch updated_on field when not reviewed' do
+      row = SpreadsheetRowResult.create!(spreadsheet_id: @spreadsheet.id,
+                                         comment: '-')
+      current_update = Time.zone.strptime(row.updated_on.to_s, '%Y-%m-%d %H:%M:%S')
+      row.safe_attributes = { author_id: @jsmith.id, reviewed: 0 }
+      row.save!
+      assert_equal current_update, Time.zone.strptime(row.updated_on.to_s, '%Y-%m-%d %H:%M:%S')
     end
 
     private

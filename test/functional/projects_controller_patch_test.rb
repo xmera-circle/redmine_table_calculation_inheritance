@@ -22,8 +22,9 @@ require File.expand_path('../test_helper', __dir__)
 
 module TableCaclulationInheritance
   class ProjectsControllerTest < ActionDispatch::IntegrationTest
-    extend RedmineTableCalculationInheritance::LoadFixtures
-    include RedmineTableCalculationInheritance::AuthenticateUser
+    extend RedmineTableCalculation::LoadFixtures
+    include RedmineTableCalculation::AuthenticateUser
+    include RedmineTableCalculation::Enumerations
     include RedmineTableCalculationInheritance::ProjectTypeCreator
     include RedmineTableCalculationInheritance::InheritatedSpreadsheets
     include Redmine::I18n
@@ -33,9 +34,13 @@ module TableCaclulationInheritance
 
     def setup
       setup_inheritated_spreadsheets
+      attrs = { project: @host_project }
+      add_spreadsheet_row_result(**attrs)
     end
 
     test 'should display spreadsheet card on projects overview page' do
+      @manager.add_permission!(:view_spreadsheet_results)
+      @developer.add_permission!(:view_spreadsheet_results)
       log_user('jsmith', 'jsmith')
       # confirm guest result to be used in aggregation
       check_guest_project_permissions
@@ -46,15 +51,15 @@ module TableCaclulationInheritance
 
       assert_select '.spreadsheet.box h3'
       assert_select 'table.list' do
-        assert_select 'tbody tr td.name', { text: @calculation_config.name, count: 1 }
-        assert_select 'tbody tr td:nth-of-type(2)', { text: /34/, count: 1 }
+        assert_select 'tbody tr td.name', { text: @sum_calculation_config.name, count: 1 }
+        assert_select 'tbody tr td:nth-of-type(3)', { text: /17/, count: 1 }
       end
       assert_select '.icon-document', 1
     end
 
     test 'should not display spreadsheet card on projects overview page if not allowed to' do
-      @manager_role.remove_permission!(:view_spreadsheet)
-      assert_not @user.allowed_to?(:view_spreadsheet, @host_project)
+      @manager.remove_permission!(:view_spreadsheet)
+      assert_not @jsmith.allowed_to?(:view_spreadsheet, @host_project)
 
       log_user('jsmith', 'jsmith')
       get project_path(@host_project.id)

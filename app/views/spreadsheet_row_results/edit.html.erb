@@ -23,4 +23,5 @@
 <%= labelled_form_for @spreadsheet_row_result, :url => spreadsheet_row_result_path(@spreadsheet_row_result) do |f| %>
   <%= render :partial => 'form', :locals => {:f => f} %>
   <%= submit_tag l(:button_save) %>
+  <%= cancel_button_tag(results_project_spreadsheet_path(id: @spreadsheet.id, project_id: @project.id)) %>
 <% end %>

@@ -18,13 +18,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+# Prepares result cells to be ready for calculations to be used in GroupedResultsTable.
+#
 class CalculatedResultTableRow < FrozenResultTableRow
-  # @return [Array(ResultTableCell)] The calculated row for the underlying spreadsheet.
   def initialize(**attrs)
     super(**attrs)
     @data_table = attrs[:data_table]
   end
 
+  # Removes the calculation name column from the result cell Array
   def result_cells
     result_row = ResultTable.new(data_table: data_table)
                             .send(:result_row, calculation_config)

@@ -17,8 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class AggregatedDataTableRow < DataTableRow
-  attr_reader :calculation_config, :calculation_columns
-
   def initialize(**attrs)
     super(**attrs)
     @calculation_config = attrs[:calculation_config]
@@ -28,6 +26,10 @@ class AggregatedDataTableRow < DataTableRow
   def cells
     filled_cells
   end
+
+  private
+
+  attr_reader :calculation_config, :calculation_columns
 
   def filled_cells
     return data_table_cells if column_gaps.none?
@@ -49,8 +51,6 @@ class AggregatedDataTableRow < DataTableRow
     end
     @data_table_cells
   end
-
-  private
 
   def calculable?(custom_field)
     calculation_config.columns.include?(custom_field)

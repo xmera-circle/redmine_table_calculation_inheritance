@@ -76,6 +76,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
   #
   # @example values.to_unsafe_hash
   #          {"28"=>"56", "44"=>"58", "45"=>"62"}
+  # @note requires strigified key and values!
   #
   def changed_custom_field_values?(values)
     current_custom_field_values != given_custom_field_values(values)
@@ -94,6 +95,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
     self.status = 1 unless status_changed?
   end
 
+  # @example Returned Hash: { '133' => '22'}
   def current_custom_field_values
     values = custom_field_values.each_with_object({}) do |custom_field_value, hash|
       value = custom_field_value.value
@@ -104,6 +106,7 @@ class SpreadsheetRowResult < ActiveRecord::Base
     values.sort.to_h
   end
 
+  # @param values [Hash(String:String)] requires strigified key and values!
   def given_custom_field_values(values)
     return {} if values.blank?
 

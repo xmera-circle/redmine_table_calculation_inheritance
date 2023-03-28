@@ -10,7 +10,7 @@
         <% end %>
       <% end %>
       <%= content_tag :tbody do %>
-        <% table.rows.each do |row| %> 
+        <% table.rows.each do |row| %>
           <%= content_tag :tr do %>
             <% row.each do |cell| %>
               <%= content_tag(:td, format_table_value(cell.value, cell.custom_field), class: 'name', data: { color: cell.cast_color }, title: cell.description) %>

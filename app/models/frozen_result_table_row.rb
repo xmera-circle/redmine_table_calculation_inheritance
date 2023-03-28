@@ -110,10 +110,11 @@ class FrozenResultTableRow
   end
 
   # Builds cells consisting of result cells or empty cells and default cells.
+  # Don't consider the calculation name column.
   def build_cells(results, offset)
     if offset.zero?
-      results.append(empty_cells(result_header_size))
-      results.append(default_cells(result_header_size))
+      results.append(empty_cells(result_header_size - 1))
+      results.append(default_cells(result_header_size - 1))
     else
       results.append(default_cells(offset))
     end
@@ -122,7 +123,7 @@ class FrozenResultTableRow
 
   # Empty cells as placeholders for table field values not yet stored
   def empty_cells(count)
-    (1..(count - 1)).map do |index|
+    (1..count).map do |index|
       SpareTableCell.new(value: nil, column_index: index, row_index: calculation_config_id)
     end
   end

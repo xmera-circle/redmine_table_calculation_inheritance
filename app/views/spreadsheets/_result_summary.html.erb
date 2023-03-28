@@ -24,7 +24,10 @@
 
 <%= tag.fieldset do %>
   <%= tag.legend do %>
-    <%= tag.strong "#{l(:label_adjusted_result_plural)} (#{date_and_author(spreadsheet_result_rows)})".html_safe %>
+    <%= tag.strong do %>
+      <%= l(:label_adjusted_result_plural) %>
+      <%= date_and_author(spreadsheet_result_rows) %>
+    <% end %>
   <% end %>
   <%= render_frozen_result_table(project, spreadsheet) %>
 <% end %>
@@ -36,9 +39,13 @@
   <%= render_aggregated_result_table(spreadsheet_row_result_query, spreadsheet_result_rows, project, spreadsheet) %>
 <% end %>
 
-<fieldset class="collapsible collapsed" style="padding: 0;">
-  <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
-    <%= tag.strong l(:label_single_calculation_results) %>
-  </legend>
-  <%= render_grouped_results_table(spreadsheet_query, spreadsheet, data_table) %>
-</fieldset>
+<%=tag.div class: 'singe-calculation-results' do %>
+  <fieldset class="collapsible collapsed" style="padding: 0;">
+    <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
+      <%= tag.strong l(:label_single_calculation_results) %>
+    </legend>
+    <%=tag.div style: 'display: none' do %>
+      <%= render_grouped_results_table(spreadsheet_query, spreadsheet, data_table) %>
+    <% end %>
+  </fieldset>
+<% end %>

@@ -104,8 +104,8 @@ module RedmineTableCalculationInheritance
     def prepare_guest_spreadsheet_column_contents
       @guest_columns = {}
       @guest_columns[@name_field] = { values: %w[Apple Orange Banana] }
-      @guest_columns[@quality_field] = { values: @enumeration_values.reverse! }
-      @guest_columns[@amount_field] = { values: [4, 6, 8].map { |i| i + 1 }.reverse! }
+      @guest_columns[@quality_field] = { values: @enumeration_values.reverse }
+      @guest_columns[@amount_field] = { values: [4, 6, 8].map { |i| i + 1 }.reverse }
       @guest_columns[@price_field] = { values: [3.95, 1.80, 4.25] }
       prepare_spreadsheet_contents(@guest_project, @guest_columns)
     end
@@ -160,6 +160,7 @@ module RedmineTableCalculationInheritance
                                        comment: 'Accepted ')
         row.custom_field_values = result
         row.save!
+        row
       end
     end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation.
+# This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
@@ -21,33 +21,29 @@
 require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
-  class FrozenResultTableHeaderTest < UnitTestCase
+  class CalculatedResultTableRowTest < UnitTestCase
     def setup
+      @jsmith = users :users_002
+      define_project_relations
       setup_frozen_result_table
       @default_columns = @frozen_result_table.send(:default_columns)
       @header = FrozenResultTableHeader.new(default_columns: @default_columns,
                                             table_config: @table_config)
+      @result_header = @header.result_header
+      @default_header = @header.default_header(@result_header.size)
+
+      @calculated_result_table_row = CalculatedResultTableRow.new(result_header: @result_header,
+                                                                  row: @spreadsheet.result_rows.first,
+                                                                  calculation_config: @max_config,
+                                                                  data_table: DataTable.new(spreadsheet: @spreadsheet))
     end
 
-    test 'should respond to columns' do
-      assert @header.respond_to?(:columns)
+    test 'should respond to data table' do
+      assert @calculated_result_table_row.send(:data_table).presence
     end
 
-    test 'should respond to result_header' do
-      assert @header.respond_to?(:result_header)
-    end
-
-    test 'should respond to default_header' do
-      assert @header.respond_to?(:default_header)
-    end
-
-    test 'should respond to each' do
-      assert @header.respond_to?(:each)
-    end
-
-    test 'should have data_table_header' do
-      expected_names = %w[Name Quality Amount Price]
-      assert_equal expected_names, @header.send(:data_table_header).map(&:name)
+    test 'should respond to status' do
+      assert_not @calculated_result_table_row.send(:status)
     end
   end
 end

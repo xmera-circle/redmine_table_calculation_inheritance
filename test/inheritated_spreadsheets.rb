@@ -40,14 +40,14 @@ module RedmineTableCalculationInheritance
   #
   module InheritatedSpreadsheets
     # Tables and calculations based on RedmineTableCalculation::PrepareDataTable
-    def setup_aggregated_result_table
+    def setup_aggregated_data_table
       define_roles_and_permissions
       define_project_relations
       define_table_config
       define_calculation_config
       @projects = @host_project.guests.prepend(@host_project)
       @projects.each do |project|
-        generate_spreadsheet(project: project)
+        generate_spreadsheet(project: project, name: 'Fruit Storage')
       end
       add_spreadsheet_row_result(project: @host_project,
                                  values: { @amount_field.id => 18 },
@@ -55,9 +55,12 @@ module RedmineTableCalculationInheritance
       add_spreadsheet_row_result(project: @host_project,
                                  values: { @quality_field.id => @enumeration_values.last },
                                  calculation_config: @max_config)
+      @query = SpreadsheetRowResultQuery.new(host_spreadsheet: @host_project.spreadsheets.first,
+                                             guest_projects: [@guest_project])
       # min calculation results are not yet frozen
-      AggregatedResultTable.new(projects: @projects,
-                                spreadsheet: @host_project.spreadsheets.first)
+      @aggregated_result_table =
+        AggregatedDataTable.new(spreadsheet: spreadsheet_by(@host_project, 'Fruit Storage'),
+                                query: @query)
     end
 
     def setup_frozen_result_table
@@ -145,17 +148,18 @@ module RedmineTableCalculationInheritance
     def add_spreadsheet_row_result(**attrs)
       project = attrs[:project]
       values = attrs[:values] || { @count_column.id => 17 }
-      calculation_config = attrs[:calculation_config]
+      calculation_config = attrs[:calculation_config] || @sum_calculation_config
       result = SpreadsheetRowResult.new(author_id: @jsmith.id,
                                         spreadsheet_id: project.spreadsheets.take.id,
                                         calculation_config_id: calculation_config.id,
                                         comment: '-')
       result.custom_field_values = values
       result.save!
+      result
     end
 
     def check_guest_project_permissions
-      assert @jsmith.allowed_to?(:view_spreadsheet, @guest_project)
+      assert @jsmith.allowed_to?(:view_spreadsheet_results, @guest_project)
       assert @jsmith.allowed_to?(:edit_spreadsheet_results, @guest_project)
     end
 

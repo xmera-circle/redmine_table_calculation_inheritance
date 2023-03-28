@@ -22,8 +22,6 @@ require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
   class FrozenResultTableTest < UnitTestCase
-    fixtures :projects,
-             :members, :member_roles, :roles, :users
     def setup
       setup_inheritated_spreadsheets
       @equipment_spreadsheet = @guest_project.spreadsheets.first
@@ -39,14 +37,14 @@ module RedmineTableCalculationInheritance
 
     test 'should have empty rows when nothing is saved yet' do
       first_row = @frozen_result_table.rows.first
-      first_expected_values = ['Number of devices', nil, nil, nil, nil, nil, nil]
+      first_expected_values = ['Number of devices', nil, nil, nil, nil, 'Not frozen', nil]
       assert_equal first_expected_values, first_row.map(&:value)
     end
 
     test 'should have frozen rows' do
-      add_spreadsheet_row_result(@guest_project)
+      add_spreadsheet_row_result(project: @guest_project)
       first_row = @frozen_result_table.rows.first
-      first_expected_values = ['Number of devices', nil, '17', nil, '-', 'New']
+      first_expected_values = ['Number of devices', nil, '17', nil, '-', 'Edited']
       # Value for Updated is removed since the time values differ by some seconds
       assert_equal first_expected_values, (first_row.map(&:value).reject { |value| value.instance_of?(ActiveSupport::TimeWithZone) })
     end

@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@ class SpreadsheetQuery
   # @note As long as the spreadsheet name is unique for each object there will
   #       be no more than one spreadsheet for each object. This assumes also
   #       that there are no typos in a certain spreadsheet name.
+  # @return [Hash(Project:Spreadsheet)]
   def guest_spreadsheets_grouped_by_project
     relation
       .where(project_id: guest_project_ids, name: host_spreadsheet.name)

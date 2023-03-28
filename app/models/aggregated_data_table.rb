@@ -21,8 +21,6 @@
 class AggregatedDataTable < DataTable
   include RedmineTableCalculation::CalculationUtils
 
-  attr_reader :query, :calculation_configs, :spreadsheet_result_rows
-
   def initialize(**attrs)
     super(**attrs)
     @query = attrs[:query]
@@ -43,15 +41,17 @@ class AggregatedDataTable < DataTable
     end
   end
 
+  private
+
+  attr_reader :query, :calculation_configs, :spreadsheet_result_rows
+
   def transpose_rows(calculation_config)
-    rows(calculation_config).map(&:cells).transpose
+    aggregated_rows(calculation_config).map(&:cells).transpose
   end
 
-  def rows(calculation_config)
+  def aggregated_rows(calculation_config)
     data_table_rows(calculation_config)
   end
-
-  private
 
   def data_table_rows(calculation_config)
     table_rows = host_result_rows(calculation_config)

@@ -23,10 +23,6 @@ class FrozenResultTableHeader
   include Redmine::I18n
   include Enumerable
 
-  attr_reader :default_columns, :table_config
-
-  delegate :size, to: :columns
-
   # @param default_columns [Array(String)] Non-customizable attributes of SpreadsheetRowResult.
   # @param table_config [TableConfig] Table configuration of the underlying Spreadsheet.
   def initialize(**attrs)
@@ -63,6 +59,9 @@ class FrozenResultTableHeader
 
   private
 
+  attr_reader :default_columns, :table_config
+
+  delegate :size, to: :columns
   delegate :calculation_configs, to: :table_config, allow_nil: true
 
   # Data table columns sorted by its position

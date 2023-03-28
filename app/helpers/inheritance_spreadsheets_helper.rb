@@ -49,26 +49,28 @@ module InheritanceSpreadsheetsHelper
             title: l(:label_inherit)
   end
 
-  # @param result_row [InheritanceSpreadsheetsHelper#result_row_of]
+  # @param result_row [InheritanceSpreadsheetsHelper#result_row_of] or
+  #                   [FrozenResultTableRow#row].
   # @param spreadsheet_row_result [InheritanceSpreadsheetsHelper#spreadsheet_row_result_params]
   #
   def new_or_edit_spreadheet_row_result_path(**params)
-    result_row = params[:result_row]
+    result_row_id = params[:result_row]&.id
     spreadsheet_row_result = params[:spreadsheet_row_result]
 
-    if result_row
-      edit_spreadsheet_row_result_path(id: result_row.id,
+    if result_row_id.presence
+      edit_spreadsheet_row_result_path(id: result_row_id,
                                        spreadsheet_row_result: spreadsheet_row_result)
     else
       new_project_spreadsheet_spreadsheet_row_result_path(
-        spreadsheet_row_result: spreadsheet_row_result
+        spreadsheet_id: spreadsheet_row_result[:spreadsheet_id],
+        spreadsheet_row_result: spreadsheet_row_result.except(:spreadsheet_id)
       )
     end
   end
 
   # @param row [AggregatedDataTableRow#cells] A row of an AggregatedDataTable
   #                                           instance.
-  # @param spreadsheet_row_result [InheritanceSpreadsheetsHelper#spreadsheet_row_result_params]
+  # @param spreadsheet_result_rows [SpreadsheetRowResult instances]
   #
   def result_row_of(row, spreadsheet_result_rows)
     spreadsheet_result_rows.find_by(calculation_config_id: calculation_config_id(row))
@@ -116,5 +118,11 @@ module InheritanceSpreadsheetsHelper
 
   def calculations_of(spreadsheet)
     spreadsheet.table_config.calculation_configs
+  end
+
+  def spreadsheet_results_exists_and_allowed_to_view?(spreadsheet, project)
+    calculations_of(spreadsheet).present? &&
+      calculations_of(spreadsheet).any?(&:inheritable?) &&
+      User.current.allowed_to?(:view_spreadsheet_results, project)
   end
 end

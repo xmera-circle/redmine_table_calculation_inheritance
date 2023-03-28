@@ -39,7 +39,7 @@
             <% end %>
             <% if editable? %>
               <%= tag.td class: 'buttons' do %>
-                <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %> 
+                <% if User.current.allowed_to?(:edit_spreadsheet_results, project) %>
                   <%= link_to l(:button_edit), new_or_edit_spreadheet_row_result_path(result_row: row,
                                                                                       spreadsheet_row_result: row.new_result_row_params), class: 'icon icon-edit' %>
                 <% end %>
