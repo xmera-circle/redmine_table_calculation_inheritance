@@ -42,7 +42,7 @@ class FrozenResultTable
   def rows
     calculation_configs.map do |calculation_config|
       row = spreadsheet_result_row_by(calculation_config_id: calculation_config.id)
-      FrozenResultTableRow.new(result_header: frozen_result_table_header.result_header,
+      FrozenResultTableRow.new(result_header: result_header,
                                calculation_config: calculation_config,
                                spreadsheet: spreadsheet,
                                row: row)
@@ -50,6 +50,10 @@ class FrozenResultTable
   end
 
   private
+
+  def result_header
+    @result_header ||= frozen_result_table_header.result_header
+  end
 
   def frozen_result_table_header
     FrozenResultTableHeader.new(default_columns: default_columns,
@@ -59,12 +63,6 @@ class FrozenResultTable
   # @returns [SpreadsheetRowResult|nil]
   def spreadsheet_result_row_by(**attrs)
     id = attrs[:calculation_config_id]
-    row = case spreadsheet_result_rows
-          when Array
-            spreadsheet_result_rows.find { |row| row.calculation_config_id == id }
-          else
-            spreadsheet_result_rows.find_by(calculation_config_id: id)
-          end
-    row.presence
+    spreadsheet_result_rows.find_by(calculation_config_id: id)
   end
 end
