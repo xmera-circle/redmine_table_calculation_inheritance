@@ -47,6 +47,14 @@ module RedmineTableCalculationInheritance
           @spreadsheet_row_result_query = SpreadsheetRowResultQuery.new(host_spreadsheet: @spreadsheet,
                                                                         guest_projects: @guests)
         end
+
+        def grouped_results
+          results
+          table = GroupedResultsTable.new(query: @spreadsheet_query,
+                                          spreadsheet: @spreadsheet,
+                                          data_table: @data_table)
+          render partial: 'grouped_results', locals: { table: table }
+        end
       end
     end
   end

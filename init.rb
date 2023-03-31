@@ -34,7 +34,7 @@ Redmine::Plugin.register :redmine_table_calculation_inheritance do
 
   project_module :table_calculation do
     permission :edit_spreadsheet_results, { spreadsheet_row_results: %i[new create edit update] }
-    permission :view_spreadsheet_results, { spreadsheets: %i[results] }
+    permission :view_spreadsheet_results, { spreadsheets: %i[results grouped_results] }
   end
 end
 
