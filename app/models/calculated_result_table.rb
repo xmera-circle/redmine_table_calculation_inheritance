@@ -34,7 +34,7 @@ class CalculatedResultTable < FrozenResultTable
   end
 
   def calculated_row(calculation_config)
-    CalculatedResultTableRow.new(result_header: frozen_result_table_header.result_header,
+    CalculatedResultTableRow.new(result_header: result_header,
                                  calculation_config: calculation_config,
                                  spreadsheet: spreadsheet,
                                  data_table: data_table)

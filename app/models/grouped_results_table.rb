@@ -70,8 +70,8 @@ class GroupedResultsTable
   # Wrapps SpreadsheetRowResult instances with a FrozenResultTableRow for
   # all relevant projects (host and guests).
   def rows
-    grouped_rows = prepare_guest_result_rows
-    @rows ||= add_host_result_rows(grouped_rows)
+    @grouped_rows ||= prepare_guest_result_rows
+    @rows ||= add_host_result_rows(@grouped_rows)
   end
 
   private
@@ -80,13 +80,8 @@ class GroupedResultsTable
 
   delegate :host_project, :guest_spreadsheets_grouped_by_project, to: :query
 
-  def frozen_result_table_header
-    FrozenResultTableHeader.new(default_columns: default_columns,
-                                table_config: table_config)
-  end
-
   def prepare_guest_result_rows
-    guest_spreadsheets_grouped_by_project.each_with_object({}) do |(project, datasheet), hash|
+    grouped_spreadsheets.each_with_object({}) do |(project, datasheet), hash|
       datasheet = datasheet[0]
       hash[project] = {}
       hash[project][:rows] = FrozenResultTable.new(spreadsheet: datasheet,
@@ -94,6 +89,10 @@ class GroupedResultsTable
       hash[project][:spreadsheet] = datasheet
       hash
     end
+  end
+
+  def grouped_spreadsheets
+    @grouped_spreadsheets ||= guest_spreadsheets_grouped_by_project
   end
 
   def add_host_result_rows(grouped_rows)
