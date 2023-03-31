@@ -32,6 +32,10 @@ module RedmineTableCalculationInheritance
         { klass: RedmineTableCalculationInheritance,
           method: :add_helper }
       end
+      RenderAsync.configure do |config|
+        config.jquery = true
+        config.nonces = true
+      end
     end
 
     private
