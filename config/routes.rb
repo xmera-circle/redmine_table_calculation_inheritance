@@ -25,3 +25,5 @@ resources :projects do
     end
   end
 end
+
+get :grouped_results, controller: :spreadsheets

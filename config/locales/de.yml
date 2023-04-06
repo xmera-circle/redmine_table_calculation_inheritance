@@ -6,6 +6,16 @@ de:
   label_adjusted_result_plural: Endergebnisse
   label_aggregated_result_plural: Berechnete Ergebnisse
   label_single_calculation_results: Einzelne Berechnungsergebnisse
+  label_row_result_comment: Begründung
+  label_row_result_status: Status
+  label_row_result_last_editing: Letze Bearbeitung
+  label_row_result_status_unfrozen: Nicht festgeschrieben
+  label_row_result_status_edited: Bearbeitet
+  label_row_result_status_review: Überprüfen
 
-  permission_view_spreadsheet_results: Berechnungsergebnisse anzeigen
-  permission_edit_spreadsheet_results: Berechnungsergebnisse bearbeiten
+  field_reviewed: Prüfung durchgeführt
+  info_text_field_reviewed: Aktualisiert das Datum der letzten Bearbeitung, selbst wenn keine Änderung durchgeführt wurde.
+
+  permission_view_spreadsheet_results: Aggregierte Berechnungsergebnisse anzeigen
+  permission_edit_spreadsheet_results: Aggregierte Berechnungsergebnisse bearbeiten
+

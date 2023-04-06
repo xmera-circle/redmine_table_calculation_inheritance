@@ -1,4 +1,3 @@
-<%
 # frozen_string_literal: true
 
 # This file is part of the Plugin Redmine Table Calculation.
@@ -18,10 +17,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-%>
 
-<%= labelled_form_for @spreadsheet_row_result, :url => project_spreadsheet_spreadsheet_row_results_path(@project, @spreadsheet) do |f| %>
-  <%= render :partial => 'form', :locals => {:f => f} %>
-  <%= submit_tag l(:button_save) %>
-  <%= cancel_button_tag(results_project_spreadsheet_path(id: @spreadsheet.id, project_id: @project.id)) %>
-<% end %>
+class SpreadsheetRowResultQuery
+  attr_reader :relation, :host_spreadsheet, :host_project, :guest_projects
+
+  def initialize(**attrs)
+    @relation = SpreadsheetRowResult.includes(:calculation_config, spreadsheet: [:project, { rows: [:custom_values] }])
+    @host_spreadsheet = attrs[:host_spreadsheet]
+    @guest_projects = attrs[:guest_projects]
+  end
+
+  # @note As long as the spreadsheet name is unique for each object there will
+  #       be no more than one spreadsheet for each object. This assumes also
+  #       that there are no typos in a certain spreadsheet name.
+  def spreadsheet_row_results
+    relation
+      .where(spreadsheet: { project_id: guest_project_ids, name: host_spreadsheet.name })
+  end
+
+  private
+
+  def guest_project_ids
+    guest_projects.map(&:id)
+  end
+end

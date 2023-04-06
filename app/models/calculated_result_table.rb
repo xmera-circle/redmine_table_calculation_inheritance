@@ -18,31 +18,29 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-class MemberResultTable < SpreadsheetResultTable
-  attr_reader :name, :member
-
-  def initialize(member, spreadsheet)
-    @name = spreadsheet.name
-    @member = member
-    super(spreadsheet)
+# Calculates host project spreadsheet data to be used in GroupedResultsTable
+#
+class CalculatedResultTable < FrozenResultTable
+  def initialize(**attrs)
+    super(**attrs)
+    @data_table = attrs[:data_table] || DataTable.new(spreadsheet: spreadsheet)
   end
 
-  ##
-  # Rows are collected over member spreadsheets. Hence,
-  # all calculations will be based on these rows.
-  #
-  def rows(_calculation_config_id = nil)
-    collection = []
-    collection << member_rows
-    collection.flatten.compact
+  # Result rows, one for each calculation.
+  def rows
+    calculation_configs.map do |calculation_config|
+      calculated_row(calculation_config)
+    end
   end
 
-  def member_rows
-    member_result_rows
+  def calculated_row(calculation_config)
+    CalculatedResultTableRow.new(result_header: result_header,
+                                 calculation_config: calculation_config,
+                                 spreadsheet: spreadsheet,
+                                 data_table: data_table)
   end
 
-  def member_result_rows
-    results = spreadsheet&.result_rows&.split&.flatten
-    results.presence
-  end
+  private
+
+  attr_reader :data_table
 end

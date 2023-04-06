@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation Inheritance.
+# This file is part of the Plugin Redmine Table Calculation.
 #
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
@@ -21,22 +21,33 @@
 require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
-  class InherentedSpreadsheetColorTest < SystemTestCase
+  class FrozenResultTableHeaderTest < UnitTestCase
     def setup
-      super
-      setup_inheritated_spreadsheets
-      attrs = { project: @guest_project }
-      add_spreadsheet_row_result(**attrs)
-      Capybara.current_session.reset!
-      log_user 'admin', 'admin'
+      setup_frozen_result_table
+      @default_columns = @frozen_result_table.send(:default_columns)
+      @header = FrozenResultTableHeader.new(default_columns: @default_columns,
+                                            table_config: @table_config)
     end
 
-    test 'should render custom field enumeration color badge in result row' do
-      visit results_project_spreadsheet_path(project_id: @host_project.id, id: @host_project.spreadsheets.first.id)
-      expected_color = 'rgba(0, 102, 204, 1)' # blue
-      Capybara.match = :first # since there are four badges (2 x blue, 2 x green)
-      current_color = page.find('.enumeration-badge td').style('background-color')['background-color']
-      assert_equal expected_color, current_color
+    test 'should respond to columns' do
+      assert @header.respond_to?(:columns)
+    end
+
+    test 'should respond to result_header' do
+      assert @header.respond_to?(:result_header)
+    end
+
+    test 'should respond to default_header' do
+      assert @header.respond_to?(:default_header)
+    end
+
+    test 'should respond to each' do
+      assert @header.respond_to?(:each)
+    end
+
+    test 'should have data_table_header' do
+      expected_names = %w[Name Quality Amount Price]
+      assert_equal expected_names, @header.send(:data_table_header).map(&:name)
     end
   end
 end

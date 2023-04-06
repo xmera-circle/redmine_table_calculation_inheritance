@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
-# This program is free software; you can redistribute it and/or
+# This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
@@ -18,28 +18,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module RedmineTableCalculationInheritance
-  ##
-  # Redmine cannot load plugin fixtures by default.
-  # This module loads first plugin fixtures and then Redmine fixtures
-  # if the listed file does not exist in the plugin fixture directory.
-  #
-  module LoadFixtures
-    def fixtures(*fixture_set_names)
-      dir = File.join(File.dirname(__FILE__), '/fixtures')
-      redmine_fixture_set_names = []
-      fixture_set_names.each do |file|
-        redmine_fixture_set_names << file unless create_fixtures(dir, file)
-      end
-      super(fixture_set_names) if redmine_fixture_set_names.any?
-    end
+# Prepares result cells to be ready for calculations to be used in GroupedResultsTable.
+#
+class CalculatedResultTableRow < FrozenResultTableRow
+  def initialize(**attrs)
+    super(**attrs)
+    @data_table = attrs[:data_table]
+  end
 
-    private
+  # Removes the calculation name column from the result cell Array
+  def result_cells
+    result_row = ResultTable.new(data_table: data_table)
+                            .send(:result_row, calculation_config)
+                            .calculate
+    result_row.delete_at(0) # calculation name column
+    result_row
+  end
 
-    def create_fixtures(dir, file)
-      return unless File.exist?("#{dir}/#{file}.yml")
+  private
 
-      ActiveRecord::FixtureSet.create_fixtures(dir, file)
-    end
+  attr_reader :data_table
+
+  def status
+    nil
   end
 end

@@ -29,4 +29,3 @@ module RedmineTableCalculationInheritance
     end
   end
 end
-

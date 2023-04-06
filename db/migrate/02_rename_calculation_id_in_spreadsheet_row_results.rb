@@ -1,9 +1,8 @@
-<%
 # frozen_string_literal: true
 
-# This file is part of the Plugin Redmine Table Calculation.
+# This file is part of the Plugin Redmine Table spreadsheet.
 #
-# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
+# Copyright (C) 2021-2023 Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,10 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-%>
 
-<%= labelled_form_for @spreadsheet_row_result, :url => project_spreadsheet_spreadsheet_row_results_path(@project, @spreadsheet) do |f| %>
-  <%= render :partial => 'form', :locals => {:f => f} %>
-  <%= submit_tag l(:button_save) %>
-  <%= cancel_button_tag(results_project_spreadsheet_path(id: @spreadsheet.id, project_id: @project.id)) %>
-<% end %>
+class RenameCalculationIdInSpreadsheetRowResults < ActiveRecord::Migration[5.2]
+  def change
+    rename_column :spreadsheet_row_results, :calculation_id, :calculation_config_id
+  end
+end

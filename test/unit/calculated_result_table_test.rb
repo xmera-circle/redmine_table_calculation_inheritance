@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
-# This program is free software; you can redistribute it and/or
+# This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
@@ -18,35 +18,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+require File.expand_path('../test_helper', __dir__)
+
 module RedmineTableCalculationInheritance
-  ##
-  # Provide user login test
-  #
-  module AuthenticateUser
-    def log_user(login, password)
-      login_page
-      log_user_in(login, password)
-      assert_equal login, User.find(user_session_id).login
+  class CalculatedResultTableTest < UnitTestCase
+    def setup
+      setup_inheritated_spreadsheets
+      @equipment_spreadsheet = @guest_project.spreadsheets.first
+      @calculated_result_table = CalculatedResultTable.new(spreadsheet: @equipment_spreadsheet)
     end
 
-    module_function
-
-    def login_page
-      User.anonymous
-      get '/login'
-      assert_nil user_session_id
-      assert_response :success
-    end
-
-    def user_session_id
-      session[:user_id]
-    end
-
-    def log_user_in(login, password)
-      post '/login', params: {
-        username: login,
-        password: password
-      }
+    test 'should respond to data table' do
+      assert @calculated_result_table.send(:data_table).presence
     end
   end
 end

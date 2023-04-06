@@ -23,9 +23,11 @@ module RedmineTableCalculationInheritance
   # Provide user login test
   #
   module Enumerations
-    def create_colored_custom_field
+    def create_colored_custom_field(*attrs)
+      name = attrs[:name]
       custom_field = TableCustomField.generate!(
-        { field_format: 'enumeration' }
+        { name: name,
+          field_format: 'enumeration' }
       )
       table_custom_field_enumerations.each do |_key, values|
         custom_field.enumerations.build(values)

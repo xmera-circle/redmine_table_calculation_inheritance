@@ -20,13 +20,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 %>
 
-<% if @project.module_enabled?(:table_calculation) && User.current.allowed_to?(:view_spreadsheet, @project) %>
+<% if @project.module_enabled?(:table_calculation) && (User.current.allowed_to?(:view_spreadsheet_results, @project) || User.current.allowed_to?(:view_spreadsheet, @project) ) %>
   <%= tag.div class: 'spreadsheet box' do %>
     <%= tag.div class: 'contextual' do %>
       <%= actions_dropdown do %>
         <%= link_to l(:label_calculation_details),
             results_project_spreadsheet_path(@project, id: spreadsheet),
-            class: 'icon icon-zoom-in' if calculations_of(spreadsheet).present? %>
+            class: 'icon icon-zoom-in' if spreadsheet_results_exists_and_allowed_to_view?(spreadsheet, @project) %>
         <%= link_to l(:label_spreadsheet_configuration), 
             edit_project_spreadsheet_path(@project, spreadsheet),
             class: 'icon icon-settings' if User.current.allowed_to?(:configure_spreadsheet, @project)%>
@@ -35,8 +35,9 @@
     <% end %>
 
     <%= tag.h3 class: 'icon icon-document' do %>
-      <%= link_to spreadsheet.name, project_spreadsheet_path(@project, id: spreadsheet) %>&nbsp;
-      <% if calculations_of(spreadsheet).present? && calculations_of(spreadsheet).any?(&:inheritable?) %>
+      <%= link_to spreadsheet.name, 
+                  project_spreadsheet_path(@project, id: spreadsheet) %>&nbsp;
+      <% if spreadsheet_results_exists_and_allowed_to_view?(spreadsheet, @project) %>
         <%= link_to l(:label_calculation_details),
               results_project_spreadsheet_path(@project, id: spreadsheet),
               class: 'icon-only icon-zoom-in',
@@ -45,7 +46,13 @@
     <% end %>
 
     <%= tag.p textilizable spreadsheet.description %>
-      <%= render_card_table(guests, project, spreadsheet) if calculations_of(spreadsheet).present? %>
+      <% if calculations_of(spreadsheet).present? && calculations_of(spreadsheet).any?(&:inheritable?) %>
+        <%= render_frozen_result_table(project, spreadsheet) if User.current.allowed_to?(:view_spreadsheet_results, @project) %>
+      <% else %>
+        <% cache spreadsheet do %>
+          <%= render_spreadsheet_result_table(spreadsheet: spreadsheet) if User.current.allowed_to?(:view_spreadsheet, @project) %>
+        <% end %>
+      <% end %>
     <%= tag.small do %>
       <%= authoring spreadsheet.created_on, spreadsheet.author %>.
       <% if spreadsheet.created_on != spreadsheet.updated_on %>

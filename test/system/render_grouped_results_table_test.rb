@@ -21,7 +21,7 @@
 require File.expand_path('../test_helper', __dir__)
 
 module RedmineTableCalculationInheritance
-  class InherentedSpreadsheetColorTest < SystemTestCase
+  class RenderGroupedResultsTableTest < SystemTestCase
     def setup
       super
       setup_inheritated_spreadsheets
@@ -31,12 +31,22 @@ module RedmineTableCalculationInheritance
       log_user 'admin', 'admin'
     end
 
-    test 'should render custom field enumeration color badge in result row' do
+    test 'should render collapsed grouped calculation results' do
       visit results_project_spreadsheet_path(project_id: @host_project.id, id: @host_project.spreadsheets.first.id)
-      expected_color = 'rgba(0, 102, 204, 1)' # blue
-      Capybara.match = :first # since there are four badges (2 x blue, 2 x green)
-      current_color = page.find('.enumeration-badge td').style('background-color')['background-color']
-      assert_equal expected_color, current_color
+      Capybara.match = :prefer_exact # since there are three fieldset items
+      assert page.find('fieldset.collapsible.collapsed')
+      visible_div = page.has_css?('fieldset.collapsible div')
+      assert_not visible_div
+    end
+
+    test 'should render expanded grouped calculation results' do
+      visit results_project_spreadsheet_path(project_id: @host_project.id, id: @host_project.spreadsheets.first.id)
+      Capybara.match = :prefer_exact # since there are three fieldset items
+      toggle = page.find('fieldset.collapsible legend')
+      toggle.click
+      assert page.has_css?('fieldset.collapsible div')
+      assert page.has_css?('fieldset.collapsible div table')
+      assert page.has_css?('.group')
     end
   end
 end

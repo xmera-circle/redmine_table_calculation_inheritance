@@ -20,6 +20,7 @@
 
 require_relative 'redmine_table_calculation_inheritance/patches/spreadsheet_patch'
 require_relative 'redmine_table_calculation_inheritance/patches/spreadsheets_controller_patch'
+require_relative 'redmine_table_calculation_inheritance/default_columns'
 
 module RedmineTableCalculationInheritance
   class << self
@@ -30,6 +31,10 @@ module RedmineTableCalculationInheritance
       AdvancedPluginHelper::Patch.apply do
         { klass: RedmineTableCalculationInheritance,
           method: :add_helper }
+      end
+      RenderAsync.configure do |config|
+        config.jquery = true
+        config.nonces = true
       end
     end
 

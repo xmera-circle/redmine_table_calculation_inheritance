@@ -1,0 +1,62 @@
+<%
+# frozen_string_literal: true
+
+# This file is part of the Plugin Redmine Table Calculation Inheritance.
+#
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
+#
+# This plugin program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+%>
+
+<%= title l(:label_calculation_summary), "#{l(:label_spreadsheet_result_plural)} #{spreadsheet.name}"%>
+
+<%= tag.fieldset do %>
+  <%= tag.legend do %>
+    <%= tag.strong do %>
+      <%= l(:label_adjusted_result_plural) %>
+      <%= date_and_author(spreadsheet_result_rows) %>
+    <% end %>
+  <% end %>
+  <%= render_frozen_result_table(project, spreadsheet) %>
+<% end %>
+
+
+
+<%= tag.fieldset do %>
+  <%= tag.legend do %>
+    <%= tag.strong l(:label_aggregated_result_plural) %>
+  <% end %>
+  <%= render_aggregated_result_table(spreadsheet_row_result_query, spreadsheet_result_rows, project, spreadsheet) %>
+<% end %>
+
+
+
+<%=tag.div id: 'grouped-calculation-results' do %>
+  <fieldset class="collapsible collapsed" style="padding: 0;">
+    <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
+      <%= tag.strong l(:label_single_calculation_results) %>
+    </legend>
+    <%=tag.div style: 'display: none' do %>
+      <%= render_grouped_results_table(project.id, spreadsheet) %>
+    <% end %>
+  </fieldset>
+<% end %>
+
+<%= content_for :render_async %>
+<%= javascript_tag do %>
+  $(function() {
+    $('#ajax-indicator').hide();
+  })
+<% end %>
