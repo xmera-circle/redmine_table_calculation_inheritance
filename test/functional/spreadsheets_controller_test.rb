@@ -39,14 +39,15 @@ module RedmineTableCalculationInheritance
       assert_response :success
       assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{@spreadsheet.name}"
       assert_select '#content fieldset legend strong', 3
-      assert_select 'tbody tr td.name', { text: @sum_calculation_config.name, count: 4 }
-      assert_select 'tbody tr td:nth-of-type(6)', { count: 6 }
-      assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 4 }
-      assert_select 'fieldset.collapsible' do
-        assert_select 'tbody tr td:nth-of-type(6)', { count: 4 }
-        assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 2 }
-        assert_select 'tbody tr td:nth-of-type(3)', { text: /17/, count: 1 } # calculated host result
-      end
+      # grouped results are asynchronosly rendered, therefore they do not count
+      assert_select 'tbody tr td.name', { text: @sum_calculation_config.name, count: 2 }
+      assert_select 'tbody tr td:nth-of-type(6)', { count: 2 }
+      assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 2 }
+      # assert_select 'fieldset.collapsible' do
+      #   assert_select 'tbody tr td:nth-of-type(6)', { count: 4 }
+      #   assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 2 }
+      #   assert_select 'tbody tr td:nth-of-type(3)', { text: /17/, count: 1 } # calculated host result
+      # end
 
       # confirm guest result to be used in aggregation
       check_guest_project_permissions
@@ -57,13 +58,14 @@ module RedmineTableCalculationInheritance
 
       assert_select 'h2', text: "#{l(:label_calculation_summary)} » #{l(:label_spreadsheet_result_plural)} #{@spreadsheet.name}"
       assert_select '#content fieldset legend strong', 3
-      assert_select 'tbody tr td.name', { text: @sum_calculation_config.name, count: 4 }
-      assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 3 }
-      assert_select 'fieldset.collapsible' do
-        assert_select 'tbody tr td:nth-of-type(6)', { count: 4 }
-        assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 1 }
-        assert_select 'tbody tr td:nth-of-type(3)', { text: /17/, count: 2 } # guest result frozen, host as above
-      end
+      # grouped results are asynchronosly rendered, therefore they do not count
+      assert_select 'tbody tr td.name', { text: @sum_calculation_config.name, count: 2 }
+      assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 2 }
+      # assert_select 'fieldset.collapsible' do
+      #   assert_select 'tbody tr td:nth-of-type(6)', { count: 4 }
+      #   assert_select 'tbody tr td:nth-of-type(6)', { text: /Not frozen/, count: 1 }
+      #   assert_select 'tbody tr td:nth-of-type(3)', { text: /17/, count: 2 } # guest result frozen, host as above
+      # end
     end
 
     test 'should response 403 if not allowed to view aggregated results' do

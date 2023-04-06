@@ -43,13 +43,13 @@
 
 
 
-<%=tag.div class: 'singe-calculation-results' do %>
+<%=tag.div id: 'grouped-calculation-results' do %>
   <fieldset class="collapsible collapsed" style="padding: 0;">
     <legend onclick="toggleFieldset(this);" class="icon icon-collapsed">
       <%= tag.strong l(:label_single_calculation_results) %>
     </legend>
     <%=tag.div style: 'display: none' do %>
-      <%= render_grouped_results_table(project.id, spreadsheet_query, spreadsheet, data_table) %>
+      <%= render_grouped_results_table(project.id, spreadsheet) %>
     <% end %>
   </fieldset>
 <% end %>

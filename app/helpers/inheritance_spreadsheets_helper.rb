@@ -34,11 +34,7 @@ module InheritanceSpreadsheetsHelper
                      spreadsheet: spreadsheet }
   end
 
-  def render_grouped_results_table(project_id, _query, spreadsheet, _data_table)
-    # render partial: 'spreadsheets/grouped_results',
-    #        locals: { table: GroupedResultsTable.new(query: query,
-    #                                                 spreadsheet: spreadsheet,
-    #                                                 data_table: data_table) }
+  def render_grouped_results_table(project_id, spreadsheet)
     render_async grouped_results_path(project_id: project_id, id: spreadsheet.id)
   end
 
