@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
+module RedmineTableCalculationInheritance
   module Patches
     module SpreadsheetsControllerPatch
       def self.prepended(base)
@@ -30,30 +30,32 @@ module TableCalculationInheritance
 
       module InstanceMethods
         ##
-        # Adds the required project type relations needed for inheritated
-        # calculations.
-        #
-        def index
-          super
-          # it may happen, that a project is included in guests, for unkown reasons yet
-          @guests = @project.guests - [@project]
-          @members = @project.guests.prepend(@project)
-        end
-
-        ##
         # Refers to the instance variables in SpreadsheetsController#index
+        # but renders results.html.erb
         #
         def results
           index
+
+          project_guests = @project.guests
+          # it may happen, that a project is included in guests, for unkown reasons yet
+          @guests = project_guests - [@project]
+          @members = project_guests.prepend(@project)
+          @spreadsheet_result_rows = @spreadsheet.result_rows
+          @spreadsheet_query = SpreadsheetQuery.new(host_project: @project,
+                                                    host_spreadsheet: @spreadsheet,
+                                                    guest_projects: @guests)
+          @spreadsheet_row_result_query = SpreadsheetRowResultQuery.new(host_spreadsheet: @spreadsheet,
+                                                                        guest_projects: @guests)
+        end
+
+        def grouped_results
+          results
+          table = GroupedResultsTable.new(query: @spreadsheet_query,
+                                          spreadsheet: @spreadsheet,
+                                          data_table: @data_table)
+          render partial: 'grouped_results', locals: { table: table }
         end
       end
     end
-  end
-end
-
-# Apply patch
-Rails.configuration.to_prepare do
-  unless SpreadsheetsController.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetsControllerPatch)
-    SpreadsheetsController.prepend TableCalculationInheritance::Patches::SpreadsheetsControllerPatch
   end
 end

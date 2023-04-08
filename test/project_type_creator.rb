@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,12 +18,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
+module RedmineTableCalculationInheritance
   ##
   # Create project types since fixtures does not work due to missing
   # project_type table
   #
   module ProjectTypeCreator
+    def project_with_type(id:, type:)
+      project = Project.find(id)
+      project.project_type_id = type
+      project.save
+      project
+    end
+
     def find_project_type(id:)
       project_type = ProjectType.find(id)
       project_type.is_project_type = true

@@ -3,7 +3,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,5 +22,6 @@
 
 <%= labelled_form_for @spreadsheet_row_result, :url => spreadsheet_row_result_path(@spreadsheet_row_result) do |f| %>
   <%= render :partial => 'form', :locals => {:f => f} %>
-  <%= submit_tag l(:button_create) %>
+  <%= submit_tag l(:button_save) %>
+  <%= cancel_button_tag(results_project_spreadsheet_path(id: @spreadsheet.id, project_id: @project.id)) %>
 <% end %>

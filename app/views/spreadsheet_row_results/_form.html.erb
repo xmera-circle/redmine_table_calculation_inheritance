@@ -3,7 +3,7 @@
 
 # This file is part of the Plugin Redmine Table spreadsheet.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,17 +22,24 @@
 
 <%= error_messages_for 'spreadsheet_row_result' %>
 
-<%= tag.div class: 'box tabular settings' do %>
-  <%= tag.legend l(:label_spreadsheet_row_result, value: @spreadsheet_row_result.calculation.name) %>
+<%= tag.div class: 'box tabular' do %>
+  <%= tag.h2 l(:label_spreadsheet_row_result, value: @spreadsheet_row_result.calculation_config.name) %>
   <%= fields :spreadsheet_row_result do |field| %>
     <%= field.hidden_field :spreadsheet_id %>
     <% @spreadsheet_row_result.custom_field_values.each do |value| %>
-      <% if @spreadsheet_row_result.calculation.field_ids.include? value.custom_field_id %>
+      <% if @spreadsheet_row_result.calculation_config.column_ids.include? value.custom_field_id %>
         <%= tag.p custom_field_tag_with_label :spreadsheet_row_result, value %>
       <% end %>
     <% end %>
     <%= tag.p f.text_area :comment, size: '6x6', required: true %>
-    <%= f.hidden_field :calculation_id %>
+    <% if %w[edit update].include?(action_name) %>
+      <%= tag.p do %>
+        <%= field.check_box :reviewed %>
+        <%= field.label l(:field_reviewed) %>
+        <%= tag.em l(:info_text_field_reviewed), class: 'info' %>
+      <% end %>
+    <% end %>
+    <%= field.hidden_field :calculation_config_id %>
   <% end %>
 <% end %>
 

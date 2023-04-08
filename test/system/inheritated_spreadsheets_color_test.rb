@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -20,28 +20,19 @@
 
 require File.expand_path('../test_helper', __dir__)
 
-module TableCaclulationInheritance
-  class InherentedSpreadsheetColorTest < ApplicationSystemTestCase
-    include TableCalculationInheritance::Enumerations
-    include TableCalculationInheritance::ProjectTypeCreator
-    include TableCalculationInheritance::InheritatedSpreadsheets
-
-    fixtures %i[projects users email_addresses roles members member_roles
-                trackers projects_trackers enabled_modules issue_statuses issues
-                enumerations custom_fields custom_values custom_fields_trackers
-                watchers journals journal_details versions
-                workflows]
-
+module RedmineTableCalculationInheritance
+  class InherentedSpreadsheetColorTest < SystemTestCase
     def setup
       super
       setup_inheritated_spreadsheets
-      add_spreadsheet_row_result(@guest_project)
+      attrs = { project: @guest_project }
+      add_spreadsheet_row_result(**attrs)
       Capybara.current_session.reset!
       log_user 'admin', 'admin'
     end
 
     test 'should render custom field enumeration color badge in result row' do
-      visit results_project_spreadsheet_path(project_id: @host_project.id, id: @spreadsheet.id)
+      visit results_project_spreadsheet_path(project_id: @host_project.id, id: @host_project.spreadsheets.first.id)
       expected_color = 'rgba(0, 102, 204, 1)' # blue
       Capybara.match = :first # since there are four badges (2 x blue, 2 x green)
       current_color = page.find('.enumeration-badge td').style('background-color')['background-color']

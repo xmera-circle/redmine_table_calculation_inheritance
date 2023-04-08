@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table spreadsheet.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ class SpreadsheetRowResultsController < ApplicationController
   before_action :find_project_by_project_id, only: %i[new create]
   before_action :find_spreadsheet
   before_action :find_project_of_spreadsheet
-  before_action :find_calculation, except: %i[edit]
+  before_action :find_calculation_config, except: %i[edit]
   before_action :authorize
 
   helper :custom_fields
@@ -36,9 +36,12 @@ class SpreadsheetRowResultsController < ApplicationController
   def new
     @spreadsheet_row_result ||= new_row
     @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
-    @spreadsheet_row_result.safe_attributes = {
-      custom_field_values: params[:cfv] || {}
-    }
+  end
+
+  def edit
+    return unless params[:spreadsheet_row_result].presence
+
+    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
   end
 
   def create
@@ -52,23 +55,14 @@ class SpreadsheetRowResultsController < ApplicationController
     end
   end
 
-  def edit; end
-
   def update
-    @spreadsheet_row_result.safe_attributes = {
-      custom_field_values: params[:cfv] || {}
-    }
-    @spreadsheet_row_result.safe_attributes = params[:spreadsheet_row_result]
-    if @spreadsheet_row_result.save
-      respond_to do |format|
-        format.html do
+    update_row_result_attributes
+    respond_to do |format|
+      format.html do
+        if @spreadsheet_row_result.save
           flash[:notice] = l(:notice_successful_update)
           redirect_to results_project_spreadsheet_path @project, @spreadsheet
-        end
-      end
-    else
-      respond_to do |format|
-        format.html do
+        else
           edit
           render action: 'edit'
         end
@@ -83,16 +77,27 @@ class SpreadsheetRowResultsController < ApplicationController
 
   private
 
+  # Saves custom field values only if they have changed!
+  def update_row_result_attributes
+    cfv = params[:spreadsheet_row_result][:custom_field_values]
+    attributes = if @spreadsheet_row_result.changed_custom_field_values?(cfv)
+                   params[:spreadsheet_row_result]
+                 else
+                   params[:spreadsheet_row_result].except(:custom_field_values)
+                 end
+    @spreadsheet_row_result.safe_attributes = attributes
+  end
+
   def new_row
     SpreadsheetRowResult.new(spreadsheet_id: @spreadsheet.id,
-                             calculation_id: @calculation.id,
+                             calculation_config_id: @calculation_config.id,
                              author_id: User.current.id,
                              comment: '')
   end
 
-  def find_calculation
-    calculation_id = params[:calculation_id] || params[:spreadsheet_row_result][:calculation_id]
-    @calculation = Calculation.find_by(id: calculation_id.to_i)
+  def find_calculation_config
+    calculation_config_id = params[:calculation_config_id] || params[:spreadsheet_row_result][:calculation_config_id]
+    @calculation_config = CalculationConfig.find_by(id: calculation_config_id.to_i)
   end
 
   def find_spreadsheet

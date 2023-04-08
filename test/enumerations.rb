@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,14 +18,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
+module RedmineTableCalculationInheritance
   ##
   # Provide user login test
   #
   module Enumerations
-    def create_colored_custom_field
+    def create_colored_custom_field(*attrs)
+      name = attrs[:name]
       custom_field = TableCustomField.generate!(
-        { field_format: 'enumeration' }
+        { name: name,
+          field_format: 'enumeration' }
       )
       table_custom_field_enumerations.each do |_key, values|
         custom_field.enumerations.build(values)

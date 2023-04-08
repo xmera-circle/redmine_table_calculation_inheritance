@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 - 2023-04-06
+
+### Added
+
+* Support for Redmine 5
+* migrations related to spreadsheet_row_results table
+* further default columns for SpreadsheetRowResult to increase the control over
+the current state of a result
+
+### Changes
+
+* associate object calculation if not enabled to be hidden
+* data models to be compatible to redmine_table_calculation 2.0.0
+
 ## 0.2.4 - 2022-10-19
 
 ### Fixed

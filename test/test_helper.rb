@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,15 +24,63 @@ $VERBOSE = nil
 # Load the Redmine helper
 require File.expand_path('../../../test/test_helper', __dir__)
 require File.expand_path('../../../test/application_system_test_case', __dir__)
-require_relative 'load_fixtures'
-require_relative 'authenticate_user'
-require_relative 'enumerations'
-require_relative 'project_type_creator'
+# Load Redmine Table Calculation plugin test helper
+require File.expand_path('../../../plugins/redmine_table_calculation/test/load_fixtures', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/authenticate_user', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/enumerations', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/project_creator', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/test_object_creators', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/prepare_spreadsheet', __dir__)
+require File.expand_path('../../../plugins/redmine_table_calculation/test/prepare_data_table', __dir__)
+# Load Redmine Table Calculation Inheritance plugin test helper
+require_relative 'prepare_spreadsheet_row_results'
 require_relative 'inheritated_spreadsheets'
-require_relative 'test_object_creators'
+require_relative 'project_type_creator'
 
 # The gem minitest-reporters gives color to the command-line
 require 'minitest/reporters'
 Minitest::Reporters.use!
 # require "minitest/rails/capybara"
 require 'mocha/minitest'
+
+module RedmineTableCalculationInheritance
+  class UnitTestCase < ActiveSupport::TestCase
+    include Redmine::I18n
+    extend RedmineTableCalculation::LoadFixtures
+    include RedmineTableCalculation::ProjectCreator
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculation::TestObjectCreators
+    include RedmineTableCalculation::Enumerations
+    include RedmineTableCalculation::PrepareDataTable
+    include RedmineTableCalculation::PrepareSpreadsheet
+    include RedmineTableCalculationInheritance::PrepareSpreadsheetRowResults
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
+
+    fixtures :projects,
+             :members, :member_roles, :roles, :users
+  end
+
+  class ControllerTestCase < ActionDispatch::IntegrationTest
+    include Redmine::I18n
+    extend RedmineTableCalculation::LoadFixtures
+    include RedmineTableCalculation::AuthenticateUser
+    include RedmineTableCalculation::Enumerations
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
+
+    fixtures :projects,
+             :members, :member_roles, :roles, :users
+  end
+
+  class SystemTestCase < ApplicationSystemTestCase
+    include RedmineTableCalculation::Enumerations
+    include RedmineTableCalculationInheritance::ProjectTypeCreator
+    include RedmineTableCalculationInheritance::InheritatedSpreadsheets
+
+    fixtures %i[projects users email_addresses roles members member_roles
+                trackers projects_trackers enabled_modules issue_statuses issues
+                enumerations custom_fields custom_values custom_fields_trackers
+                watchers journals journal_details versions
+                workflows]
+  end
+end

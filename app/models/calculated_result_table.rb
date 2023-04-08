@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,21 +18,29 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-module TableCalculationInheritance
-  module Patches
-    module SpreadsheetPatch
-      def self.prepended(base)
-        base.class_eval do
-          has_many :result_rows, class_name: 'SpreadsheetRowResult', dependent: :destroy
-        end
-      end
+# Calculates host project spreadsheet data to be used in GroupedResultsTable
+#
+class CalculatedResultTable < FrozenResultTable
+  def initialize(**attrs)
+    super(**attrs)
+    @data_table = attrs[:data_table] || DataTable.new(spreadsheet: spreadsheet)
+  end
+
+  # Result rows, one for each calculation.
+  def rows
+    calculation_configs.map do |calculation_config|
+      calculated_row(calculation_config)
     end
   end
-end
 
-# Apply patch
-Rails.configuration.to_prepare do
-  unless Spreadsheet.included_modules.include?(TableCalculationInheritance::Patches::SpreadsheetPatch)
-    Spreadsheet.prepend TableCalculationInheritance::Patches::SpreadsheetPatch
+  def calculated_row(calculation_config)
+    CalculatedResultTableRow.new(result_header: result_header,
+                                 calculation_config: calculation_config,
+                                 spreadsheet: spreadsheet,
+                                 data_table: data_table)
   end
+
+  private
+
+  attr_reader :data_table
 end

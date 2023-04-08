@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,25 +19,47 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 class SpreadsheetRowResult < ActiveRecord::Base
+  include RedmineTableCalculation::CalculationUtils
   include Redmine::SafeAttributes
+  include Redmine::I18n
+
+  attr_accessor :reviewed
+
   acts_as_customizable
 
-  belongs_to :calculation
-  belongs_to :spreadsheet
+  belongs_to :calculation_config
+  # Do not touch result rows for caching since it is used for
+  # documenting last editing!
+  belongs_to :spreadsheet, inverse_of: :result_rows
   belongs_to :author, class_name: 'User'
 
+  validates :comment, presence: true
+
+  after_validation :update_status, :change_hosts_status, :touch_updated_on
   after_destroy :destroy_adapted_row_values
 
-  validates_presence_of :comment
+  delegate :table_config, :project, to: :spreadsheet
+  delegate :calculation_configs, to: :table_config
+  delegate :host_ids, to: :project
 
   safe_attributes(
     :author_id,
     :spreadsheet_id,
-    :calculation_id,
+    :calculation_config_id,
     :custom_fields,
     :custom_field_values,
-    :comment
+    :comment,
+    :reviewed
   )
+
+  STATUS = { label_row_result_status_edited: 1,
+             label_row_result_status_review: 2 }.freeze
+
+  # Translates the database value for status via the mapped
+  # label in an understandable value for the user.
+  def status
+    l(STATUS.key(read_attribute(:status)))
+  end
 
   ##
   # Is required by ApplicationHelpers#format_object.
@@ -46,20 +68,87 @@ class SpreadsheetRowResult < ActiveRecord::Base
     true
   end
 
+  # @overridden Redmine::Acts::Customizable#available_custom_fields
   def available_custom_fields
-    CustomField.where(id: column_ids).sorted.to_a
+    CustomField.where(id: calculation_column_ids).sorted.to_a
+  end
+
+  # Compare given custom field values with their current values.
+  # Format: {"custom_field1.id" => "value1", "custom_field2.id" => "value2"}
+  #
+  # @example values.to_unsafe_hash
+  #          {"28"=>"56", "44"=>"58", "45"=>"62"}
+  # @note requires strigified key and values!
+  #
+  def changed_custom_field_values?(values)
+    current_custom_field_values != given_custom_field_values(values)
   end
 
   private
 
-  ##
-  # TODO: delegate to table
+  # Updates status to: 1 <=> edited when the user has edited the record.
   #
-  def column_ids
-    spreadsheet&.table&.column_ids
+  # This method assumes that the user is not able to set the status by himself.
+  # If the status would change than it is controlled through the codebase and
+  # this change would pass.
+  def update_status
+    return if new_record?
+
+    self.status = 1 unless status_changed?
+  end
+
+  # @example Returned Hash: { '133' => '22'}
+  def current_custom_field_values
+    values = custom_field_values.each_with_object({}) do |custom_field_value, hash|
+      value = custom_field_value.value
+      custom_field = custom_field_value.custom_field
+      hash[custom_field.id.to_s] = value if value
+      hash
+    end
+    values.sort.to_h
+  end
+
+  # @param values [Hash(String:String)] requires strigified key and values!
+  def given_custom_field_values(values)
+    return {} if values.blank?
+
+    safe = values.respond_to?(:to_unsafe_hash) ? values.to_unsafe_hash : values
+    safe.sort.to_h
   end
 
   def destroy_adapted_row_values
     CustomValue.where(customized_id: id).delete_all
+  end
+
+  # Host instances of SpreadsheetRowResult will be marked to be reviewed.
+  #
+  # rubocop:disable Rails/SkipsModelValidations
+  def change_hosts_status
+    return unless custom_field_values_changed?
+
+    SpreadsheetRowResult.no_touching do
+      SpreadsheetRowResult
+        .includes(:calculation_config, spreadsheet: [project: [:hosts]])
+        .where(calculation_config: calculation_config_id,
+               spreadsheet: { project_id: host_ids, name: spreadsheet.name })
+        .update_all(status: 2)
+    end
+  end
+  # rubocop:enable Rails/SkipsModelValidations
+
+  # Will touch the last processing date even if no data have changed.
+  # This is useful to explicitly mark a record as reviewed.
+  #
+  # rubocop:disable Rails/SkipsModelValidations
+  def touch_updated_on
+    touch if reviewed?
+  end
+  # rubocop:enable Rails/SkipsModelValidations
+
+  # The attribute :reviewed is a kind of boolean (1, 0) submitted
+  # by the edit form. The value is not persistend. It will only be
+  # used to trigger a touch of the record.
+  def reviewed?
+    reviewed.to_i.positive?
   end
 end

@@ -2,7 +2,7 @@
 
 # This file is part of the Plugin Redmine Table Calculation Inheritance.
 #
-# Copyright (C) 2021 - 2022  Liane Hampe <liaham@xmera.de>, xmera.
+# Copyright (C) 2021-2023  Liane Hampe <liaham@xmera.de>, xmera Solutions GmbH.
 #
 # This plugin program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,5 +18,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-require 'table_calculation_inheritance/patches/spreadsheet_patch'
-require 'table_calculation_inheritance/patches/spreadsheets_controller_patch'
+require File.expand_path('../test_helper', __dir__)
+
+module RedmineTableCalculationInheritance
+  class CalculatedResultTableTest < UnitTestCase
+    def setup
+      setup_inheritated_spreadsheets
+      @equipment_spreadsheet = @guest_project.spreadsheets.first
+      @calculated_result_table = CalculatedResultTable.new(spreadsheet: @equipment_spreadsheet)
+    end
+
+    test 'should respond to data table' do
+      assert @calculated_result_table.send(:data_table).presence
+    end
+  end
+end
